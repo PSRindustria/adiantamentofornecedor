@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulário de Adiantamento à Fornecedor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -13,6 +14,9 @@
         <div class="form-container">
             <form id="adiantamentoForm">
                 <div class="header">
+                    <div class="logo-area">
+                        <!-- Área reservada para logo da empresa, se necessário -->
+                    </div>
                     <div class="title">
                         <h1>FORMULÁRIO DE ADIANTAMENTO À FORNECEDOR</h1>
                     </div>
@@ -22,191 +26,303 @@
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label for="codigoFornecedor">CÓDIGO FORNECEDOR:</label>
-                        <input type="text" id="codigoFornecedor" name="codigoFornecedor" placeholder="Insira aqui o código interno do fornecedor">
-                    </div>
-                    <div class="form-group half">
-                        <label for="finalidade">FINALIDADE:</label>
-                        <textarea id="finalidade" name="finalidade" placeholder="Insira aqui a observação descrita na ordem de compra ou a finalidade do pagamento.
+                <div class="progress-bar">
+                    <div class="progress" id="formProgress"></div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="codigoFornecedor">
+                                <i class="fas fa-hashtag"></i> CÓDIGO FORNECEDOR:
+                                <span class="tooltip" data-tooltip="Código interno do fornecedor no sistema">?</span>
+                            </label>
+                            <input type="text" id="codigoFornecedor" name="codigoFornecedor" placeholder="Insira aqui o código interno do fornecedor" class="input-animated">
+                            <div class="validation-message" id="codigoFornecedor-validation"></div>
+                        </div>
+                        <div class="form-group half">
+                            <label for="finalidade">
+                                <i class="fas fa-info-circle"></i> FINALIDADE:
+                                <span class="tooltip" data-tooltip="Descreva a finalidade do adiantamento">?</span>
+                            </label>
+                            <textarea id="finalidade" name="finalidade" placeholder="Insira aqui a observação descrita na ordem de compra ou a finalidade do pagamento.
 Exemplo: Férias MM/AAAA.
-Exemplo: Aquisição de matéria prima (papel)."></textarea>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group full">
-                        <label for="fornecedor">FORNECEDOR:</label>
-                        <input type="text" id="fornecedor" name="fornecedor" placeholder="Insira aqui a razão social do fornecedor">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label for="cnpjFornecedor">CNPJ FORNECEDOR:</label>
-                        <input type="text" id="cnpjFornecedor" name="cnpjFornecedor" placeholder="XX.XXX.XXX/XXXX-XX">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label for="dataEmissao">DATA DE EMISSÃO:</label>
-                        <input type="date" id="dataEmissao" name="dataEmissao">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label for="dataPagamento">DATA PARA PAGAMENTO:</label>
-                        <input type="date" id="dataPagamento" name="dataPagamento">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label for="ordemCompra">ORDEM DE COMPRA:</label>
-                        <input type="text" id="ordemCompra" name="ordemCompra">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label for="valor">VALOR:</label>
-                        <input type="number" id="valor" name="valor" step="0.01" min="0">
-                    </div>
-                    <div class="form-group half">
-                        <h3>DADOS PARA PAGAMENTO:</h3>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label for="formaPagamento">FORMA DE PAGAMENTO:</label>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" id="pixTed" name="formaPagamento" value="PIX/TED">
-                                <label for="pixTed">PIX/TED</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="boleto" name="formaPagamento" value="BOLETO">
-                                <label for="boleto">BOLETO</label>
-                            </div>
+Exemplo: Aquisição de matéria prima (papel)." class="input-animated"></textarea>
+                            <div class="validation-message" id="finalidade-validation"></div>
                         </div>
                     </div>
-                    <div class="form-group half">
-                        <label for="beneficiario">BENEFICIÁRIO:</label>
-                        <input type="text" id="beneficiario" name="beneficiario" placeholder="Insira o titular da conta de quem receberá">
+
+                    <div class="form-row">
+                        <div class="form-group full">
+                            <label for="fornecedor">
+                                <i class="fas fa-building"></i> FORNECEDOR:
+                                <span class="tooltip" data-tooltip="Razão social completa do fornecedor">?</span>
+                            </label>
+                            <input type="text" id="fornecedor" name="fornecedor" placeholder="Insira aqui a razão social do fornecedor" class="input-animated">
+                            <div class="validation-message" id="fornecedor-validation"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="cnpjFornecedor">
+                                <i class="fas fa-id-card"></i> CNPJ FORNECEDOR:
+                                <span class="tooltip" data-tooltip="CNPJ no formato XX.XXX.XXX/XXXX-XX">?</span>
+                            </label>
+                            <input type="text" id="cnpjFornecedor" name="cnpjFornecedor" placeholder="XX.XXX.XXX/XXXX-XX" class="input-animated" data-mask="cnpj">
+                            <div class="validation-message" id="cnpjFornecedor-validation"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="dataEmissao">
+                                <i class="fas fa-calendar-alt"></i> DATA DE EMISSÃO:
+                                <span class="tooltip" data-tooltip="Data de emissão do formulário">?</span>
+                            </label>
+                            <input type="date" id="dataEmissao" name="dataEmissao" class="input-animated">
+                            <div class="validation-message" id="dataEmissao-validation"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="dataPagamento">
+                                <i class="fas fa-calendar-check"></i> DATA PARA PAGAMENTO:
+                                <span class="tooltip" data-tooltip="Data prevista para o pagamento">?</span>
+                            </label>
+                            <input type="date" id="dataPagamento" name="dataPagamento" class="input-animated">
+                            <div class="validation-message" id="dataPagamento-validation"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="ordemCompra">
+                                <i class="fas fa-file-invoice"></i> ORDEM DE COMPRA:
+                                <span class="tooltip" data-tooltip="Número da ordem de compra relacionada">?</span>
+                            </label>
+                            <input type="text" id="ordemCompra" name="ordemCompra" class="input-animated">
+                            <div class="validation-message" id="ordemCompra-validation"></div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label for="solicitante">SOLICITANTE:</label>
-                        <input type="text" id="solicitante" name="solicitante" placeholder="Insira aqui o seu nome">
+                <div class="form-section">
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="valor">
+                                <i class="fas fa-money-bill-wave"></i> VALOR:
+                                <span class="tooltip" data-tooltip="Valor do adiantamento em reais">?</span>
+                            </label>
+                            <div class="input-prefix">
+                                <span>R$</span>
+                                <input type="number" id="valor" name="valor" step="0.01" min="0" class="input-animated" placeholder="0,00">
+                            </div>
+                            <div class="validation-message" id="valor-validation"></div>
+                        </div>
+                        <div class="form-group half">
+                            <h3><i class="fas fa-university"></i> DADOS PARA PAGAMENTO:</h3>
+                        </div>
                     </div>
-                    <div class="form-group half">
-                        <label for="cpfCnpj">CPF / CNPJ:</label>
-                        <input type="text" id="cpfCnpj" name="cpfCnpj" placeholder="Insira o CPF ou CNPJ do titular da conta">
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="formaPagamento">
+                                <i class="fas fa-credit-card"></i> FORMA DE PAGAMENTO:
+                                <span class="tooltip" data-tooltip="Selecione a forma de pagamento desejada">?</span>
+                            </label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="pixTed" name="formaPagamento" value="PIX/TED">
+                                    <label for="pixTed" class="radio-label">PIX/TED</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="boleto" name="formaPagamento" value="BOLETO">
+                                    <label for="boleto" class="radio-label">BOLETO</label>
+                                </div>
+                            </div>
+                            <div class="validation-message" id="formaPagamento-validation"></div>
+                        </div>
+                        <div class="form-group half">
+                            <label for="beneficiario">
+                                <i class="fas fa-user"></i> BENEFICIÁRIO:
+                                <span class="tooltip" data-tooltip="Nome completo do beneficiário do pagamento">?</span>
+                            </label>
+                            <input type="text" id="beneficiario" name="beneficiario" placeholder="Insira o titular da conta de quem receberá" class="input-animated">
+                            <div class="validation-message" id="beneficiario-validation"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="solicitante">
+                                <i class="fas fa-user-edit"></i> SOLICITANTE:
+                                <span class="tooltip" data-tooltip="Nome completo do solicitante">?</span>
+                            </label>
+                            <input type="text" id="solicitante" name="solicitante" placeholder="Insira aqui o seu nome" class="input-animated">
+                            <div class="validation-message" id="solicitante-validation"></div>
+                        </div>
+                        <div class="form-group half">
+                            <label for="cpfCnpj">
+                                <i class="fas fa-id-card"></i> CPF / CNPJ:
+                                <span class="tooltip" data-tooltip="CPF ou CNPJ do beneficiário">?</span>
+                            </label>
+                            <input type="text" id="cpfCnpj" name="cpfCnpj" placeholder="Insira o CPF ou CNPJ do titular da conta" class="input-animated" data-mask="cpfcnpj">
+                            <div class="validation-message" id="cpfCnpj-validation"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="departamento">
+                                <i class="fas fa-sitemap"></i> DEPARTAMENTO:
+                                <span class="tooltip" data-tooltip="Departamento do solicitante">?</span>
+                            </label>
+                            <input type="text" id="departamento" name="departamento" placeholder="Insira aqui o departamento ao qual pertence" class="input-animated">
+                            <div class="validation-message" id="departamento-validation"></div>
+                        </div>
+                        <div class="form-group half banco-field">
+                            <label for="banco">
+                                <i class="fas fa-landmark"></i> BANCO:
+                                <span class="tooltip" data-tooltip="Nome do banco para depósito">?</span>
+                            </label>
+                            <input type="text" id="banco" name="banco" placeholder="Insira o banco de destino do pagamento" class="input-animated">
+                            <div class="validation-message" id="banco-validation"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="dataLimitePrestacao">
+                                <i class="fas fa-hourglass-end"></i> DATA LIMITE PARA PRESTAÇÃO DE CONTAS:
+                                <span class="tooltip" data-tooltip="Data limite para prestação de contas (30 dias após emissão)">?</span>
+                            </label>
+                            <input type="date" id="dataLimitePrestacao" name="dataLimitePrestacao" class="input-animated" readonly>
+                            <div class="validation-message" id="dataLimitePrestacao-validation"></div>
+                        </div>
+                        <div class="form-group half banco-field">
+                            <label for="agencia">
+                                <i class="fas fa-store-alt"></i> AGÊNCIA:
+                                <span class="tooltip" data-tooltip="Número da agência bancária">?</span>
+                            </label>
+                            <input type="text" id="agencia" name="agencia" placeholder="Insira a agência do titular da conta" class="input-animated">
+                            <div class="validation-message" id="agencia-validation"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half"></div>
+                        <div class="form-group half banco-field">
+                            <label for="conta">
+                                <i class="fas fa-wallet"></i> CONTA:
+                                <span class="tooltip" data-tooltip="Número da conta bancária">?</span>
+                            </label>
+                            <input type="text" id="conta" name="conta" placeholder="Insira o n° da conta do titular da conta" class="input-animated">
+                            <div class="validation-message" id="conta-validation"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half"></div>
+                        <div class="form-group half banco-field">
+                            <label for="tipoConta">
+                                <i class="fas fa-piggy-bank"></i> TIPO DE CONTA:
+                                <span class="tooltip" data-tooltip="Tipo da conta bancária">?</span>
+                            </label>
+                            <select id="tipoConta" name="tipoConta" class="input-animated">
+                                <option value="">Selecione</option>
+                                <option value="Corrente">Corrente</option>
+                                <option value="Poupança">Poupança</option>
+                            </select>
+                            <div class="validation-message" id="tipoConta-validation"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half"></div>
+                        <div class="form-group half pix-field">
+                            <label for="chavePix">
+                                <i class="fas fa-key"></i> CHAVE PIX:
+                                <span class="tooltip" data-tooltip="Chave PIX do beneficiário">?</span>
+                            </label>
+                            <input type="text" id="chavePix" name="chavePix" placeholder="Insira a chave pix de quem receberá o pgto" class="input-animated">
+                            <div class="validation-message" id="chavePix-validation"></div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label for="departamento">DEPARTAMENTO:</label>
-                        <input type="text" id="departamento" name="departamento" placeholder="Insira aqui o departamento ao qual pertence">
+                <div class="form-section">
+                    <div class="section-title">
+                        <h3><i class="fas fa-list-alt"></i> ADIANTAMENTOS EM ABERTO</h3>
                     </div>
-                    <div class="form-group half">
-                        <label for="banco">BANCO:</label>
-                        <input type="text" id="banco" name="banco" placeholder="Insira o banco de destino do pagamento">
-                    </div>
-                </div>
 
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label for="dataLimitePrestacao">DATA LIMITE PARA PRESTAÇÃO DE CONTAS:</label>
-                        <input type="date" id="dataLimitePrestacao" name="dataLimitePrestacao">
+                    <div class="table-container">
+                        <table id="adiantamentosTable">
+                            <thead>
+                                <tr>
+                                    <th>ORDEM DE COMPRA</th>
+                                    <th>DATA LIMITE PRESTAÇÃO DE CONTAS</th>
+                                    <th>VALOR EM ABERTO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="text" name="adiantamentoOC[]" class="input-animated"></td>
+                                    <td><input type="date" name="adiantamentoData[]" class="input-animated"></td>
+                                    <td>
+                                        <div class="input-prefix">
+                                            <span>R$</span>
+                                            <input type="number" name="adiantamentoValor[]" step="0.01" min="0" class="input-animated" placeholder="0,00">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" name="adiantamentoOC[]" class="input-animated"></td>
+                                    <td><input type="date" name="adiantamentoData[]" class="input-animated"></td>
+                                    <td>
+                                        <div class="input-prefix">
+                                            <span>R$</span>
+                                            <input type="number" name="adiantamentoValor[]" step="0.01" min="0" class="input-animated" placeholder="0,00">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" name="adiantamentoOC[]" class="input-animated"></td>
+                                    <td><input type="date" name="adiantamentoData[]" class="input-animated"></td>
+                                    <td>
+                                        <div class="input-prefix">
+                                            <span>R$</span>
+                                            <input type="number" name="adiantamentoValor[]" step="0.01" min="0" class="input-animated" placeholder="0,00">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button type="button" id="addRowBtn" class="secondary-button">
+                            <i class="fas fa-plus"></i> Adicionar linha
+                        </button>
                     </div>
-                    <div class="form-group half">
-                        <label for="agencia">AGÊNCIA:</label>
-                        <input type="text" id="agencia" name="agencia" placeholder="Insira a agência do titular da conta">
+
+                    <div class="signatures">
+                        <div class="signature-field">
+                            <div class="signature-line"></div>
+                            <p>Solicitante</p>
+                        </div>
+                        <div class="signature-field">
+                            <div class="signature-line"></div>
+                            <p>Controladoria</p>
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-row">
-                    <div class="form-group half"></div>
-                    <div class="form-group half">
-                        <label for="conta">CONTA:</label>
-                        <input type="text" id="conta" name="conta" placeholder="Insira o n° da conta do titular da conta">
+                    <div class="form-actions">
+                        <button type="button" id="limparFormBtn" class="secondary-button">
+                            <i class="fas fa-eraser"></i> Limpar Formulário
+                        </button>
+                        <button type="button" id="gerarPdfBtn" class="primary-button">
+                            <i class="fas fa-file-pdf"></i> Gerar PDF
+                        </button>
                     </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group half"></div>
-                    <div class="form-group half">
-                        <label for="tipoConta">TIPO DE CONTA:</label>
-                        <select id="tipoConta" name="tipoConta">
-                            <option value="">Selecione</option>
-                            <option value="Corrente">Corrente</option>
-                            <option value="Poupança">Poupança</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group half"></div>
-                    <div class="form-group half">
-                        <label for="chavePix">CHAVE PIX:</label>
-                        <input type="text" id="chavePix" name="chavePix" placeholder="Insira a chave pix de quem receberá o pgto">
-                    </div>
-                </div>
-
-                <div class="section-title">
-                    <h3>ADIANTAMENTOS EM ABERTO</h3>
-                </div>
-
-                <div class="table-container">
-                    <table id="adiantamentosTable">
-                        <thead>
-                            <tr>
-                                <th>ORDEM DE COMPRA</th>
-                                <th>DATA LIMITE PRESTAÇÃO DE CONTAS</th>
-                                <th>VALOR EM ABERTO</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><input type="text" name="adiantamentoOC[]"></td>
-                                <td><input type="date" name="adiantamentoData[]"></td>
-                                <td><input type="number" name="adiantamentoValor[]" step="0.01" min="0"></td>
-                            </tr>
-                            <tr>
-                                <td><input type="text" name="adiantamentoOC[]"></td>
-                                <td><input type="date" name="adiantamentoData[]"></td>
-                                <td><input type="number" name="adiantamentoValor[]" step="0.01" min="0"></td>
-                            </tr>
-                            <tr>
-                                <td><input type="text" name="adiantamentoOC[]"></td>
-                                <td><input type="date" name="adiantamentoData[]"></td>
-                                <td><input type="number" name="adiantamentoValor[]" step="0.01" min="0"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="signatures">
-                    <div class="signature-field">
-                        <div class="signature-line"></div>
-                        <p>Solicitante</p>
-                    </div>
-                    <div class="signature-field">
-                        <div class="signature-line"></div>
-                        <p>Controladoria</p>
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="button" id="gerarPdfBtn">Gerar PDF</button>
                 </div>
             </form>
         </div>
@@ -215,14 +331,24 @@ Exemplo: Aquisição de matéria prima (papel)."></textarea>
     <div id="pdfPreview" class="pdf-preview">
         <div class="pdf-preview-content">
             <div class="pdf-preview-header">
-                <h2>Visualização do PDF</h2>
-                <button id="closePdfPreview">×</button>
+                <h2><i class="fas fa-file-pdf"></i> Visualização do PDF</h2>
+                <button id="closePdfPreview" class="close-button">×</button>
             </div>
             <div id="pdfContainer"></div>
             <div class="pdf-preview-actions">
-                <button id="downloadPdfBtn">Baixar PDF</button>
+                <button id="downloadPdfBtn" class="primary-button">
+                    <i class="fas fa-download"></i> Baixar PDF
+                </button>
             </div>
         </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <div class="toast-content">
+            <i class="fas fa-check-circle toast-icon"></i>
+            <div class="toast-message">Mensagem de sucesso</div>
+        </div>
+        <div class="toast-progress"></div>
     </div>
 
     <script src="script.js"></script>

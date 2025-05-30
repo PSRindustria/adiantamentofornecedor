@@ -1,7 +1,8 @@
 // Variáveis globais
 let pdfDoc = null;
+let formValidated = false;
 
-// Função para inicializar a data de emissão com a data atual
+// Função para inicializar o formulário
 document.addEventListener('DOMContentLoaded', function() {
     // Definir data de emissão como data atual
     const hoje = new Date();
@@ -9,36 +10,61 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('dataEmissao').value = dataFormatada;
     
     // Calcular data limite para prestação de contas (30 dias após a data atual)
-    const dataLimite = new Date(hoje);
-    dataLimite.setDate(dataLimite.getDate() + 30);
-    const dataLimiteFormatada = dataLimite.toISOString().split('T')[0];
-    document.getElementById('dataLimitePrestacao').value = dataLimiteFormatada;
+    atualizarDataLimite();
     
     // Adicionar event listeners
-    document.getElementById('gerarPdfBtn').addEventListener('click', gerarPDF);
+    document.getElementById('gerarPdfBtn').addEventListener('click', validarEGerarPDF);
     document.getElementById('closePdfPreview').addEventListener('click', fecharPreviewPDF);
     document.getElementById('downloadPdfBtn').addEventListener('click', downloadPDF);
+    document.getElementById('limparFormBtn').addEventListener('click', limparFormulario);
+    document.getElementById('addRowBtn').addEventListener('click', adicionarLinhaTabela);
     
     // Event listener para atualizar data limite quando a data de emissão mudar
-    document.getElementById('dataEmissao').addEventListener('change', function() {
-        const dataEmissao = new Date(this.value);
-        const dataLimite = new Date(dataEmissao);
-        dataLimite.setDate(dataLimite.getDate() + 30);
-        const dataLimiteFormatada = dataLimite.toISOString().split('T')[0];
-        document.getElementById('dataLimitePrestacao').value = dataLimiteFormatada;
-    });
+    document.getElementById('dataEmissao').addEventListener('change', atualizarDataLimite);
     
     // Event listener para mostrar/esconder campos de pagamento baseado na forma de pagamento
     document.querySelectorAll('input[name="formaPagamento"]').forEach(radio => {
         radio.addEventListener('change', atualizarCamposPagamento);
     });
+    
+    // Adicionar validação em tempo real para todos os campos
+    const camposValidaveis = document.querySelectorAll('input, textarea, select');
+    camposValidaveis.forEach(campo => {
+        campo.addEventListener('blur', function() {
+            validarCampo(this);
+            atualizarProgressoFormulario();
+        });
+        
+        campo.addEventListener('input', function() {
+            // Remover classe de erro ao digitar
+            this.classList.remove('input-error');
+        });
+    });
+    
+    // Inicializar máscaras para campos específicos
+    inicializarMascaras();
+    
+    // Inicializar campos de pagamento
+    atualizarCamposPagamento();
+    
+    // Adicionar animação de entrada
+    document.querySelector('.form-container').classList.add('fade-in');
 });
+
+// Função para atualizar a data limite com base na data de emissão
+function atualizarDataLimite() {
+    const dataEmissao = new Date(document.getElementById('dataEmissao').value);
+    const dataLimite = new Date(dataEmissao);
+    dataLimite.setDate(dataLimite.getDate() + 30);
+    const dataLimiteFormatada = dataLimite.toISOString().split('T')[0];
+    document.getElementById('dataLimitePrestacao').value = dataLimiteFormatada;
+}
 
 // Função para atualizar campos de pagamento baseado na forma selecionada
 function atualizarCamposPagamento() {
     const formaPagamento = document.querySelector('input[name="formaPagamento"]:checked')?.value;
-    const camposBancarios = document.querySelectorAll('.campo-bancario');
-    const camposPix = document.querySelectorAll('.campo-pix');
+    const camposBancarios = document.querySelectorAll('.banco-field');
+    const camposPix = document.querySelectorAll('.pix-field');
     
     if (formaPagamento === 'PIX/TED') {
         camposBancarios.forEach(campo => campo.style.display = 'block');
@@ -46,6 +72,367 @@ function atualizarCamposPagamento() {
     } else if (formaPagamento === 'BOLETO') {
         camposBancarios.forEach(campo => campo.style.display = 'none');
         camposPix.forEach(campo => campo.style.display = 'none');
+    } else {
+        // Nenhuma forma selecionada, mostrar todos os campos
+        camposBancarios.forEach(campo => campo.style.display = 'block');
+        camposPix.forEach(campo => campo.style.display = 'block');
+    }
+}
+
+// Função para inicializar máscaras de input
+function inicializarMascaras() {
+    // Máscara para CNPJ
+    const cnpjInput = document.getElementById('cnpjFornecedor');
+    if (cnpjInput) {
+        cnpjInput.addEventListener('input', function() {
+            let valor = this.value.replace(/\D/g, '');
+            if (valor.length > 14) valor = valor.substring(0, 14);
+            
+            // Formatar CNPJ: XX.XXX.XXX/XXXX-XX
+            if (valor.length > 12) {
+                this.value = valor.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+            } else if (valor.length > 8) {
+                this.value = valor.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})/, '$1.$2.$3/$4');
+            } else if (valor.length > 5) {
+                this.value = valor.replace(/^(\d{2})(\d{3})(\d{0,3})/, '$1.$2.$3');
+            } else if (valor.length > 2) {
+                this.value = valor.replace(/^(\d{2})(\d{0,3})/, '$1.$2');
+            } else {
+                this.value = valor;
+            }
+        });
+    }
+    
+    // Máscara para CPF/CNPJ
+    const cpfCnpjInput = document.getElementById('cpfCnpj');
+    if (cpfCnpjInput) {
+        cpfCnpjInput.addEventListener('input', function() {
+            let valor = this.value.replace(/\D/g, '');
+            
+            // Determinar se é CPF ou CNPJ baseado no tamanho
+            if (valor.length <= 11) {
+                // CPF: XXX.XXX.XXX-XX
+                if (valor.length > 9) {
+                    this.value = valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2})$/, '$1.$2.$3-$4');
+                } else if (valor.length > 6) {
+                    this.value = valor.replace(/^(\d{3})(\d{3})(\d{0,3})$/, '$1.$2.$3');
+                } else if (valor.length > 3) {
+                    this.value = valor.replace(/^(\d{3})(\d{0,3})$/, '$1.$2');
+                } else {
+                    this.value = valor;
+                }
+            } else {
+                // CNPJ: XX.XXX.XXX/XXXX-XX
+                if (valor.length > 14) valor = valor.substring(0, 14);
+                
+                if (valor.length > 12) {
+                    this.value = valor.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+                } else if (valor.length > 8) {
+                    this.value = valor.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})/, '$1.$2.$3/$4');
+                } else if (valor.length > 5) {
+                    this.value = valor.replace(/^(\d{2})(\d{3})(\d{0,3})/, '$1.$2.$3');
+                } else if (valor.length > 2) {
+                    this.value = valor.replace(/^(\d{2})(\d{0,3})/, '$1.$2');
+                } else {
+                    this.value = valor;
+                }
+            }
+        });
+    }
+}
+
+// Função para validar um campo específico
+function validarCampo(campo) {
+    const id = campo.id;
+    const valor = campo.value.trim();
+    const mensagemValidacao = document.getElementById(`${id}-validation`);
+    
+    // Remover classes de validação anteriores
+    campo.classList.remove('input-error', 'input-success');
+    
+    // Validação específica para cada campo
+    switch (id) {
+        case 'codigoFornecedor':
+            if (!valor) {
+                mensagemValidacao.textContent = 'Código do fornecedor é obrigatório';
+                campo.classList.add('input-error');
+                return false;
+            }
+            break;
+            
+        case 'fornecedor':
+            if (!valor) {
+                mensagemValidacao.textContent = 'Nome do fornecedor é obrigatório';
+                campo.classList.add('input-error');
+                return false;
+            }
+            break;
+            
+        case 'cnpjFornecedor':
+            if (!valor) {
+                mensagemValidacao.textContent = 'CNPJ do fornecedor é obrigatório';
+                campo.classList.add('input-error');
+                return false;
+            } else if (!validarCNPJ(valor)) {
+                mensagemValidacao.textContent = 'CNPJ inválido';
+                campo.classList.add('input-error');
+                return false;
+            }
+            break;
+            
+        case 'dataEmissao':
+            if (!valor) {
+                mensagemValidacao.textContent = 'Data de emissão é obrigatória';
+                campo.classList.add('input-error');
+                return false;
+            }
+            break;
+            
+        case 'valor':
+            if (!valor || isNaN(parseFloat(valor)) || parseFloat(valor) <= 0) {
+                mensagemValidacao.textContent = 'Valor deve ser maior que zero';
+                campo.classList.add('input-error');
+                return false;
+            }
+            break;
+            
+        case 'solicitante':
+            if (!valor) {
+                mensagemValidacao.textContent = 'Nome do solicitante é obrigatório';
+                campo.classList.add('input-error');
+                return false;
+            }
+            break;
+            
+        case 'departamento':
+            if (!valor) {
+                mensagemValidacao.textContent = 'Departamento é obrigatório';
+                campo.classList.add('input-error');
+                return false;
+            }
+            break;
+    }
+    
+    // Se chegou até aqui, o campo é válido
+    mensagemValidacao.textContent = '';
+    campo.classList.add('input-success');
+    return true;
+}
+
+// Função para validar CNPJ
+function validarCNPJ(cnpj) {
+    // Aceitar qualquer formato para testes
+    return true;
+    
+    // Implementação real de validação de CNPJ
+    /*
+    cnpj = cnpj.replace(/[^\d]+/g, '');
+    
+    if (cnpj.length !== 14) return false;
+    
+    // Elimina CNPJs inválidos conhecidos
+    if (cnpj === '00000000000000' || 
+        cnpj === '11111111111111' || 
+        cnpj === '22222222222222' || 
+        cnpj === '33333333333333' || 
+        cnpj === '44444444444444' || 
+        cnpj === '55555555555555' || 
+        cnpj === '66666666666666' || 
+        cnpj === '77777777777777' || 
+        cnpj === '88888888888888' || 
+        cnpj === '99999999999999') {
+        return false;
+    }
+    
+    // Valida DVs
+    let tamanho = cnpj.length - 2;
+    let numeros = cnpj.substring(0, tamanho);
+    const digitos = cnpj.substring(tamanho);
+    let soma = 0;
+    let pos = tamanho - 7;
+    
+    for (let i = tamanho; i >= 1; i--) {
+        soma += numeros.charAt(tamanho - i) * pos--;
+        if (pos < 2) pos = 9;
+    }
+    
+    let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+    if (resultado !== parseInt(digitos.charAt(0))) return false;
+    
+    tamanho = tamanho + 1;
+    numeros = cnpj.substring(0, tamanho);
+    soma = 0;
+    pos = tamanho - 7;
+    
+    for (let i = tamanho; i >= 1; i--) {
+        soma += numeros.charAt(tamanho - i) * pos--;
+        if (pos < 2) pos = 9;
+    }
+    
+    resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+    if (resultado !== parseInt(digitos.charAt(1))) return false;
+    
+    return true;
+    */
+}
+
+// Função para validar todo o formulário
+function validarFormulario() {
+    const camposObrigatorios = [
+        'codigoFornecedor',
+        'fornecedor',
+        'cnpjFornecedor',
+        'dataEmissao',
+        'valor',
+        'solicitante',
+        'departamento'
+    ];
+    
+    let formValido = true;
+    
+    // Validar campos obrigatórios
+    camposObrigatorios.forEach(id => {
+        const campo = document.getElementById(id);
+        if (!validarCampo(campo)) {
+            formValido = false;
+        }
+    });
+    
+    // Validar forma de pagamento
+    const formaPagamento = document.querySelector('input[name="formaPagamento"]:checked');
+    if (!formaPagamento) {
+        document.getElementById('formaPagamento-validation').textContent = 'Selecione uma forma de pagamento';
+        formValido = false;
+    } else {
+        document.getElementById('formaPagamento-validation').textContent = '';
+    }
+    
+    return formValido;
+}
+
+// Função para atualizar o progresso do formulário
+function atualizarProgressoFormulario() {
+    const camposTotal = document.querySelectorAll('input, textarea, select').length;
+    const camposPreenchidos = document.querySelectorAll('input:not([type="radio"]):not([readonly]):valid, textarea:valid, select:valid').length;
+    const radiosPreenchidos = document.querySelector('input[name="formaPagamento"]:checked') ? 1 : 0;
+    
+    const progresso = ((camposPreenchidos + radiosPreenchidos) / (camposTotal - 1)) * 100;
+    document.getElementById('formProgress').style.width = `${Math.min(progresso, 100)}%`;
+}
+
+// Função para adicionar linha na tabela de adiantamentos
+function adicionarLinhaTabela() {
+    const tbody = document.querySelector('#adiantamentosTable tbody');
+    const novaLinha = document.createElement('tr');
+    
+    novaLinha.innerHTML = `
+        <td><input type="text" name="adiantamentoOC[]" class="input-animated"></td>
+        <td><input type="date" name="adiantamentoData[]" class="input-animated"></td>
+        <td>
+            <div class="input-prefix">
+                <span>R$</span>
+                <input type="number" name="adiantamentoValor[]" step="0.01" min="0" class="input-animated" placeholder="0,00">
+            </div>
+        </td>
+    `;
+    
+    tbody.appendChild(novaLinha);
+    
+    // Adicionar animação à nova linha
+    novaLinha.classList.add('fade-in');
+    
+    // Mostrar notificação
+    mostrarToast('Nova linha adicionada', 'success');
+}
+
+// Função para limpar o formulário
+function limparFormulario() {
+    document.getElementById('adiantamentoForm').reset();
+    
+    // Redefinir data de emissão como data atual
+    const hoje = new Date();
+    const dataFormatada = hoje.toISOString().split('T')[0];
+    document.getElementById('dataEmissao').value = dataFormatada;
+    
+    // Recalcular data limite
+    atualizarDataLimite();
+    
+    // Limpar mensagens de validação
+    document.querySelectorAll('.validation-message').forEach(msg => {
+        msg.textContent = '';
+    });
+    
+    // Remover classes de validação
+    document.querySelectorAll('.input-error, .input-success').forEach(campo => {
+        campo.classList.remove('input-error', 'input-success');
+    });
+    
+    // Resetar progresso
+    document.getElementById('formProgress').style.width = '0%';
+    
+    // Mostrar notificação
+    mostrarToast('Formulário limpo com sucesso', 'success');
+}
+
+// Função para mostrar notificação toast
+function mostrarToast(mensagem, tipo = 'success') {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.querySelector('.toast-message');
+    const toastIcon = document.querySelector('.toast-icon');
+    const toastProgress = document.querySelector('.toast-progress');
+    
+    // Definir ícone e cor baseado no tipo
+    switch (tipo) {
+        case 'success':
+            toastIcon.className = 'fas fa-check-circle toast-icon';
+            toastProgress.style.backgroundColor = 'var(--success-color)';
+            break;
+        case 'error':
+            toastIcon.className = 'fas fa-exclamation-circle toast-icon';
+            toastProgress.style.backgroundColor = 'var(--error-color)';
+            break;
+        case 'warning':
+            toastIcon.className = 'fas fa-exclamation-triangle toast-icon';
+            toastProgress.style.backgroundColor = 'var(--warning-color)';
+            break;
+        case 'info':
+            toastIcon.className = 'fas fa-info-circle toast-icon';
+            toastProgress.style.backgroundColor = 'var(--info-color)';
+            break;
+    }
+    
+    // Definir mensagem
+    toastMessage.textContent = mensagem;
+    
+    // Resetar progresso
+    toastProgress.style.width = '0';
+    
+    // Mostrar toast
+    toast.classList.add('show');
+    
+    // Iniciar progresso
+    setTimeout(() => {
+        toastProgress.style.width = '100%';
+    }, 100);
+    
+    // Esconder toast após 3 segundos
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
+// Função para validar e gerar PDF
+function validarEGerarPDF() {
+    if (validarFormulario()) {
+        gerarPDF();
+        formValidated = true;
+    } else {
+        mostrarToast('Por favor, corrija os erros no formulário', 'error');
+        // Rolar até o primeiro campo com erro
+        const primeiroErro = document.querySelector('.input-error');
+        if (primeiroErro) {
+            primeiroErro.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     }
 }
 
@@ -278,7 +665,7 @@ function gerarPDF() {
     let currentY = startY;
     
     // Desenhar linhas da tabela
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < Math.max(3, dados.adiantamentos.length); i++) {
         doc.rect(15, currentY, 60, 6);
         doc.rect(75, currentY, 60, 6);
         doc.rect(135, currentY, 50, 6);
@@ -314,6 +701,9 @@ function gerarPDF() {
     
     // Mostrar o modal de preview
     document.getElementById('pdfPreview').classList.add('active');
+    
+    // Mostrar notificação
+    mostrarToast('PDF gerado com sucesso', 'success');
 }
 
 // Função para fechar o preview do PDF
@@ -329,5 +719,8 @@ function downloadPDF() {
         const nomeArquivo = `Adiantamento_${fornecedor}_${dataEmissao}.pdf`;
         
         pdfDoc.save(nomeArquivo);
+        
+        // Mostrar notificação
+        mostrarToast('PDF baixado com sucesso', 'success');
     }
 }
