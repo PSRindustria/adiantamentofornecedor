@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Adiantamento à Fornecedor</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <form id="adiantamentoForm">
+                <div class="header">
+                    <div class="title">
+                        <h1>FORMULÁRIO DE ADIANTAMENTO À FORNECEDOR</h1>
+                    </div>
+                    <div class="form-info">
+                        <p class="form-code">FOR_FIN_02_02</p>
+                        <p class="form-version">VERSÃO: 01</p>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="codigoFornecedor">CÓDIGO FORNECEDOR:</label>
+                        <input type="text" id="codigoFornecedor" name="codigoFornecedor" placeholder="Insira aqui o código interno do fornecedor">
+                    </div>
+                    <div class="form-group half">
+                        <label for="finalidade">FINALIDADE:</label>
+                        <textarea id="finalidade" name="finalidade" placeholder="Insira aqui a observação descrita na ordem de compra ou a finalidade do pagamento.
+Exemplo: Férias MM/AAAA.
+Exemplo: Aquisição de matéria prima (papel)."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group full">
+                        <label for="fornecedor">FORNECEDOR:</label>
+                        <input type="text" id="fornecedor" name="fornecedor" placeholder="Insira aqui a razão social do fornecedor">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="cnpjFornecedor">CNPJ FORNECEDOR:</label>
+                        <input type="text" id="cnpjFornecedor" name="cnpjFornecedor" placeholder="XX.XXX.XXX/XXXX-XX">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="dataEmissao">DATA DE EMISSÃO:</label>
+                        <input type="date" id="dataEmissao" name="dataEmissao">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="dataPagamento">DATA PARA PAGAMENTO:</label>
+                        <input type="date" id="dataPagamento" name="dataPagamento">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="ordemCompra">ORDEM DE COMPRA:</label>
+                        <input type="text" id="ordemCompra" name="ordemCompra">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="valor">VALOR:</label>
+                        <input type="number" id="valor" name="valor" step="0.01" min="0">
+                    </div>
+                    <div class="form-group half">
+                        <h3>DADOS PARA PAGAMENTO:</h3>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="formaPagamento">FORMA DE PAGAMENTO:</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="pixTed" name="formaPagamento" value="PIX/TED">
+                                <label for="pixTed">PIX/TED</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="boleto" name="formaPagamento" value="BOLETO">
+                                <label for="boleto">BOLETO</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group half">
+                        <label for="beneficiario">BENEFICIÁRIO:</label>
+                        <input type="text" id="beneficiario" name="beneficiario" placeholder="Insira o titular da conta de quem receberá">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="solicitante">SOLICITANTE:</label>
+                        <input type="text" id="solicitante" name="solicitante" placeholder="Insira aqui o seu nome">
+                    </div>
+                    <div class="form-group half">
+                        <label for="cpfCnpj">CPF / CNPJ:</label>
+                        <input type="text" id="cpfCnpj" name="cpfCnpj" placeholder="Insira o CPF ou CNPJ do titular da conta">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="departamento">DEPARTAMENTO:</label>
+                        <input type="text" id="departamento" name="departamento" placeholder="Insira aqui o departamento ao qual pertence">
+                    </div>
+                    <div class="form-group half">
+                        <label for="banco">BANCO:</label>
+                        <input type="text" id="banco" name="banco" placeholder="Insira o banco de destino do pagamento">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="dataLimitePrestacao">DATA LIMITE PARA PRESTAÇÃO DE CONTAS:</label>
+                        <input type="date" id="dataLimitePrestacao" name="dataLimitePrestacao">
+                    </div>
+                    <div class="form-group half">
+                        <label for="agencia">AGÊNCIA:</label>
+                        <input type="text" id="agencia" name="agencia" placeholder="Insira a agência do titular da conta">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half"></div>
+                    <div class="form-group half">
+                        <label for="conta">CONTA:</label>
+                        <input type="text" id="conta" name="conta" placeholder="Insira o n° da conta do titular da conta">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half"></div>
+                    <div class="form-group half">
+                        <label for="tipoConta">TIPO DE CONTA:</label>
+                        <select id="tipoConta" name="tipoConta">
+                            <option value="">Selecione</option>
+                            <option value="Corrente">Corrente</option>
+                            <option value="Poupança">Poupança</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half"></div>
+                    <div class="form-group half">
+                        <label for="chavePix">CHAVE PIX:</label>
+                        <input type="text" id="chavePix" name="chavePix" placeholder="Insira a chave pix de quem receberá o pgto">
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <h3>ADIANTAMENTOS EM ABERTO</h3>
+                </div>
+
+                <div class="table-container">
+                    <table id="adiantamentosTable">
+                        <thead>
+                            <tr>
+                                <th>ORDEM DE COMPRA</th>
+                                <th>DATA LIMITE PRESTAÇÃO DE CONTAS</th>
+                                <th>VALOR EM ABERTO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" name="adiantamentoOC[]"></td>
+                                <td><input type="date" name="adiantamentoData[]"></td>
+                                <td><input type="number" name="adiantamentoValor[]" step="0.01" min="0"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" name="adiantamentoOC[]"></td>
+                                <td><input type="date" name="adiantamentoData[]"></td>
+                                <td><input type="number" name="adiantamentoValor[]" step="0.01" min="0"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" name="adiantamentoOC[]"></td>
+                                <td><input type="date" name="adiantamentoData[]"></td>
+                                <td><input type="number" name="adiantamentoValor[]" step="0.01" min="0"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="signatures">
+                    <div class="signature-field">
+                        <div class="signature-line"></div>
+                        <p>Solicitante</p>
+                    </div>
+                    <div class="signature-field">
+                        <div class="signature-line"></div>
+                        <p>Controladoria</p>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="gerarPdfBtn">Gerar PDF</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="pdfPreview" class="pdf-preview">
+        <div class="pdf-preview-content">
+            <div class="pdf-preview-header">
+                <h2>Visualização do PDF</h2>
+                <button id="closePdfPreview">×</button>
+            </div>
+            <div id="pdfContainer"></div>
+            <div class="pdf-preview-actions">
+                <button id="downloadPdfBtn">Baixar PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
