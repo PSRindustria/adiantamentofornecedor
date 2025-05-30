@@ -28,8 +28,8 @@ body {
 }
 
 .container {
-    max-width: 1000px;
-    margin: 0 auto;
+    max-width: 1000px; /* Mantido para tela */
+    margin: 20px auto; /* Adicionado margem superior/inferior */
     background-color: #fff;
     border-radius: 8px;
     box-shadow: var(--shadow);
@@ -41,40 +41,56 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px; /* Reduzido */
     border-bottom: 2px solid var(--primary-color);
-    padding-bottom: 15px;
+    padding-bottom: 10px; /* Reduzido */
     position: relative;
 }
 
+.logo-area {
+    flex: 0 0 130px; /* Reduzido */
+    margin-right: 15px;
+}
+
+.logo-area img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.title {
+    flex-grow: 1; /* Permite que o título ocupe o espaço restante */
+    text-align: center;
+}
+
 .title h1 {
-    font-size: 24px;
+    font-size: 20px; /* Reduzido */
     color: var(--primary-color);
     font-weight: bold;
-    text-align: center;
 }
 
 .form-info {
     text-align: right;
+    flex: 0 0 90px; /* Reduzido */
 }
 
 .form-code {
     font-weight: bold;
     color: var(--primary-color);
-    font-size: 16px;
+    font-size: 13px; /* Reduzido */
 }
 
 .form-version {
-    font-size: 14px;
+    font-size: 11px; /* Reduzido */
     color: #555;
 }
 
 /* Barra de progresso */
 .progress-bar {
-    height: 6px;
+    height: 5px; /* Reduzido */
     background-color: var(--secondary-color);
     border-radius: 3px;
-    margin-bottom: 25px;
+    margin-bottom: 20px; /* Reduzido */
     overflow: hidden;
 }
 
@@ -87,23 +103,23 @@ body {
 
 /* Seções do formulário */
 .form-section {
-    margin-bottom: 30px;
-    padding: 20px;
-    border-radius: 8px;
+    margin-bottom: 15px; /* Reduzido */
+    padding: 10px 15px; /* Padding horizontal mantido, vertical reduzido */
+    border-radius: 6px; /* Reduzido */
     background-color: #fff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eee;
 }
 
 /* Linhas e grupos de formulário */
 .form-row {
     display: flex;
     flex-wrap: wrap;
-    margin: 0 -10px 15px;
+    margin: 0 -6px 10px; /* Gap reduzido */
 }
 
 .form-group {
-    margin-bottom: 20px;
-    padding: 0 10px;
+    margin-bottom: 10px; /* Reduzido */
+    padding: 0 6px; /* Gap reduzido */
     position: relative;
 }
 
@@ -117,30 +133,33 @@ body {
 
 /* Campos de formulário */
 label {
-    display: block;
-    margin-bottom: 8px;
+    display: flex; /* Usar flex para alinhar ícone e texto */
+    align-items: center;
+    margin-bottom: 4px; /* Reduzido */
     font-weight: 600;
     color: var(--text-color);
-    font-size: 14px;
+    font-size: 12px; /* Reduzido */
 }
 
 label i {
     margin-right: 5px;
     color: var(--primary-color);
+    font-size: 1em; /* Tamanho do ícone relativo ao label */
+    line-height: 1; /* Alinhamento vertical */
 }
 
-.input-animated {
+.input-animated, select.input-animated, textarea.input-animated {
     width: 100%;
-    padding: 10px 12px;
+    padding: 6px 8px; /* Reduzido */
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 12px; /* Reduzido */
     transition: var(--transition);
 }
 
 .input-animated:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.15);
+    box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.15);
     outline: none;
 }
 
@@ -149,8 +168,9 @@ label i {
 }
 
 textarea.input-animated {
-    height: 80px;
+    height: 60px; /* Reduzido */
     resize: vertical;
+    line-height: 1.4; /* Melhorar leitura */
 }
 
 /* Input com prefixo (R$) */
@@ -162,20 +182,21 @@ textarea.input-animated {
 
 .input-prefix span {
     position: absolute;
-    left: 12px;
+    left: 8px; /* Ajustado */
     color: #666;
     font-weight: 500;
+    font-size: 12px;
 }
 
 .input-prefix input {
-    padding-left: 35px;
+    padding-left: 30px; /* Ajustado */
 }
 
 /* Grupo de radio buttons */
 .radio-group {
     display: flex;
-    gap: 20px;
-    margin-top: 5px;
+    gap: 12px; /* Reduzido */
+    margin-top: 4px;
 }
 
 .radio-option {
@@ -184,42 +205,45 @@ textarea.input-animated {
 }
 
 .radio-option input[type="radio"] {
-    margin-right: 8px;
+    margin-right: 4px; /* Reduzido */
     cursor: pointer;
 }
 
 .radio-label {
     margin-bottom: 0;
     cursor: pointer;
+    font-size: 12px;
+    font-weight: normal; /* Label normal */
 }
 
 /* Tooltips */
 .tooltip {
     display: inline-block;
-    width: 16px;
-    height: 16px;
+    width: 14px; /* Reduzido */
+    height: 14px; /* Reduzido */
     background-color: #ccc;
     color: white;
     border-radius: 50%;
     text-align: center;
-    line-height: 16px;
-    font-size: 12px;
-    margin-left: 5px;
+    line-height: 14px;
+    font-size: 10px; /* Reduzido */
+    margin-left: 4px;
     cursor: help;
     position: relative;
+    vertical-align: middle; /* Alinhar com texto */
 }
 
 .tooltip:hover::after {
     content: attr(data-tooltip);
     position: absolute;
-    bottom: 125%;
+    bottom: 130%; /* Ajustado */
     left: 50%;
     transform: translateX(-50%);
     background-color: #333;
     color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 12px;
+    padding: 3px 6px; /* Reduzido */
+    border-radius: 3px;
+    font-size: 10px; /* Reduzido */
     white-space: nowrap;
     z-index: 10;
 }
@@ -227,30 +251,31 @@ textarea.input-animated {
 /* Títulos de seção */
 h3 {
     color: var(--primary-color);
-    margin: 15px 0 10px;
-    font-size: 16px;
+    margin: 10px 0 6px; /* Reduzido */
+    font-size: 14px; /* Reduzido */
     display: flex;
     align-items: center;
 }
 
 h3 i {
-    margin-right: 8px;
+    margin-right: 5px; /* Reduzido */
+    font-size: 1em;
 }
 
 .section-title {
     background-color: var(--secondary-color);
-    padding: 12px 15px;
-    margin: 20px 0 15px;
-    border-left: 4px solid var(--primary-color);
+    padding: 8px 10px; /* Reduzido */
+    margin: 12px 0 10px; /* Reduzido */
+    border-left: 3px solid var(--primary-color);
     border-radius: 0 4px 4px 0;
 }
 
 /* Tabela de adiantamentos */
 .table-container {
-    margin: 15px 0;
+    margin: 10px 0; /* Reduzido */
     overflow-x: auto;
     border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eee;
 }
 
 table {
@@ -259,9 +284,10 @@ table {
 }
 
 th, td {
-    padding: 12px 15px;
+    padding: 8px 10px; /* Reduzido */
     text-align: left;
     border: 1px solid var(--border-color);
+    font-size: 12px; /* Consistente com inputs */
 }
 
 th {
@@ -274,7 +300,8 @@ td input {
     border: none;
     background: transparent;
     width: 100%;
-    padding: 5px 0;
+    padding: 3px 0; /* Reduzido */
+    font-size: 12px;
 }
 
 td input:focus {
@@ -286,14 +313,14 @@ td input:focus {
     background-color: #f8f9fa;
     color: var(--text-color);
     border: 1px solid var(--border-color);
-    padding: 8px 15px;
-    font-size: 14px;
+    padding: 5px 10px; /* Reduzido */
+    font-size: 12px; /* Reduzido */
     border-radius: 4px;
     cursor: pointer;
     transition: var(--transition);
     display: inline-flex;
     align-items: center;
-    margin-top: 10px;
+    margin-top: 6px; /* Reduzido */
 }
 
 .secondary-button:hover {
@@ -301,41 +328,43 @@ td input:focus {
 }
 
 .secondary-button i {
-    margin-right: 5px;
+    margin-right: 4px;
 }
 
 /* Assinaturas */
 .signatures {
     display: flex;
     justify-content: space-between;
-    margin-top: 40px;
+    margin-top: 25px; /* Reduzido */
 }
 
 .signature-field {
-    width: 200px;
+    width: 160px; /* Reduzido */
     text-align: center;
+    font-size: 12px;
 }
 
 .signature-line {
     border-top: 1px solid #000;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
+    margin-top: 35px; /* Espaço para assinar */
 }
 
 /* Botões de ação */
 .form-actions {
-    margin-top: 30px;
+    margin-top: 20px; /* Reduzido */
     text-align: center;
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 10px; /* Reduzido */
 }
 
 .primary-button {
     background-color: var(--primary-color);
     color: white;
     border: none;
-    padding: 12px 24px;
-    font-size: 16px;
+    padding: 8px 16px; /* Reduzido */
+    font-size: 13px; /* Reduzido */
     border-radius: 4px;
     cursor: pointer;
     transition: var(--transition);
@@ -345,23 +374,23 @@ td input:focus {
 
 .primary-button:hover {
     background-color: var(--primary-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .primary-button i, .secondary-button i {
-    margin-right: 8px;
+    margin-right: 5px; /* Reduzido */
 }
 
 /* Mensagens de validação */
 .validation-message {
-    font-size: 12px;
+    font-size: 10px; /* Reduzido */
     color: var(--error-color);
-    margin-top: 5px;
-    min-height: 18px;
+    margin-top: 3px; /* Reduzido */
+    min-height: 14px; /* Reduzido */
 }
 
-/* Visualização do PDF */
+/* Visualização do PDF (mantido para funcionalidade JS, mas não impresso) */
 .pdf-preview {
     display: none;
     position: fixed;
@@ -453,7 +482,7 @@ td input:focus {
     background-color: white;
 }
 
-/* Toast notifications */
+/* Toast notifications (mantido para funcionalidade JS, mas não impresso) */
 .toast {
     position: fixed;
     bottom: 30px;
@@ -509,40 +538,42 @@ td input:focus {
 
 /* Campos específicos */
 .banco-field, .pix-field {
-    display: none;
+    display: none; /* Mantido, JS controla visibilidade */
 }
 
-/* Responsividade */
+/* Responsividade (mantida para tela) */
 @media (max-width: 768px) {
+    .container {
+        padding: 15px;
+        margin: 10px auto;
+    }
+    .header {
+        flex-direction: column;
+        text-align: center;
+    }
+    .logo-area {
+        margin-bottom: 15px;
+        margin-right: 0;
+        flex-basis: auto;
+        width: 120px; /* Tamanho menor em telas pequenas */
+    }
+    .form-info {
+        text-align: center;
+        margin-top: 10px;
+        flex-basis: auto;
+    }
     .half {
         width: 100%;
     }
-    
     .signatures {
         flex-direction: column;
         align-items: center;
         gap: 20px;
     }
-    
-    .header {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .form-info {
-        text-align: center;
-        margin-top: 10px;
-    }
-    
     .form-actions {
         flex-direction: column;
         gap: 10px;
     }
-    
-    .container {
-        padding: 15px;
-    }
-    
     .form-section {
         padding: 15px;
     }
@@ -558,12 +589,326 @@ td input:focus {
     animation: fadeIn 0.3s ease;
 }
 
-/* Estilo para campos com erro */
+/* Estilo para campos com erro/sucesso */
 .input-error {
     border-color: var(--error-color) !important;
 }
-
-/* Estilo para campos com sucesso */
 .input-success {
     border-color: var(--success-color) !important;
 }
+
+
+/* --- Estilos de Impressão EXTREMAMENTE OTIMIZADOS (Espaço + Estética + Cabeçalho Largo) --- */
+@media print {
+    @page {
+        size: A4;
+        margin: 0.8cm; /* Margens ainda mais reduzidas */
+    }
+
+    html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: #fff !important;
+        color: #000 !important;
+        font-family: 'Segoe UI', Arial, sans-serif !important;
+        font-size: 8pt; /* Tamanho base ainda menor */
+        line-height: 1.2; /* Espaçamento entre linhas mínimo */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .container {
+        max-width: none !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+        background-color: #fff !important;
+    }
+
+    /* Cabeçalho Full Width */
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0 0 10px 0 !important; /* Margem inferior reduzida */
+        padding: 8px 0; /* Padding vertical reduzido */
+        border-bottom: 1px solid #000 !important;
+        position: relative;
+        width: 100% !important;
+    }
+
+    .logo-area {
+        flex: 0 0 90px; /* Reduzido */
+        margin-right: 8px;
+        margin-left: 0;
+    }
+
+    .logo-area img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .title {
+        flex-grow: 1;
+        text-align: center;
+        padding: 0 4px;
+    }
+
+    .title h1 {
+        font-size: 12pt; /* Reduzido */
+        color: #000 !important;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .form-info {
+        text-align: right;
+        flex: 0 0 70px; /* Reduzido */
+        margin-right: 0;
+    }
+
+    .form-code,
+    .form-version {
+        font-size: 7pt; /* Reduzido */
+        color: #000 !important;
+        font-weight: normal;
+        line-height: 1.1;
+    }
+
+    /* Seções */
+    .form-section {
+        margin-bottom: 8px !important; /* Reduzido */
+        padding: 6px 0 !important; /* Padding vertical reduzido */
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+        border-top: 1px dotted #ccc !important; /* Separador leve */
+        page-break-inside: avoid !important;
+        background-color: #fff !important;
+    }
+    .form-section:first-of-type {
+        border-top: none !important;
+    }
+
+    /* Linhas e Grupos */
+    .form-row {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        margin: 0 -3px 6px !important; /* Gap mínimo */
+        gap: 0 !important;
+    }
+
+    .form-group {
+        margin-bottom: 6px !important; /* Reduzido */
+        padding: 0 3px !important; /* Gap mínimo */
+        position: relative;
+        flex-grow: 1 !important;
+        flex-shrink: 1 !important;
+    }
+
+    .half {
+        width: 50% !important;
+        flex-basis: 50% !important;
+    }
+
+    .full {
+        width: 100% !important;
+        flex-basis: 100% !important;
+    }
+
+    /* Labels e Inputs - Mantendo Estética */
+    label {
+        display: flex !important;
+        align-items: center;
+        margin-bottom: 2px !important; /* Mínimo */
+        font-weight: 600 !important;
+        color: #000 !important;
+        font-size: 7.5pt !important; /* Mínimo legível */
+    }
+
+    label i {
+        display: inline-block !important;
+        margin-right: 3px !important;
+        color: #000 !important;
+        font-size: 1em !important;
+        line-height: 1 !important;
+        vertical-align: middle;
+    }
+
+    .input-animated, select.input-animated, textarea.input-animated {
+        width: 100% !important;
+        padding: 3px 5px !important; /* Mínimo */
+        border: 1px solid #aaa !important; /* Borda visível */
+        border-radius: 2px !important;
+        font-size: 7.5pt !important;
+        box-shadow: none !important;
+        background-color: #fff !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        line-height: 1.2 !important; /* Compacto */
+    }
+
+    textarea.input-animated {
+        height: auto !important;
+        min-height: 20px !important; /* Mínimo */
+        resize: none !important;
+    }
+
+    .input-prefix span {
+        position: absolute !important;
+        left: 5px !important;
+        color: #000 !important;
+        font-weight: normal !important;
+        font-size: 7.5pt !important;
+    }
+
+    .input-prefix input {
+        padding-left: 22px !important; /* Ajustado */
+    }
+
+    /* Radios */
+    .radio-group {
+        display: flex !important;
+        gap: 6px !important; /* Reduzido */
+        margin-top: 1px !important;
+    }
+
+    .radio-option {
+        display: flex !important;
+        align-items: center;
+    }
+
+    .radio-option input[type="radio"] {
+        margin-right: 2px !important;
+        vertical-align: middle;
+    }
+
+    .radio-label {
+        margin-bottom: 0 !important;
+        font-size: 7.5pt !important;
+        vertical-align: middle;
+        font-weight: normal !important;
+    }
+
+    /* Títulos h3 e section-title */
+    h3 {
+        color: #000 !important;
+        margin: 6px 0 4px !important; /* Reduzido */
+        font-size: 9pt !important; /* Reduzido */
+        font-weight: bold !important;
+        display: flex !important;
+        align-items: center;
+    }
+
+    h3 i {
+        display: inline-block !important;
+        margin-right: 3px !important;
+        color: #000 !important;
+        font-size: 1em !important;
+    }
+
+    .section-title {
+        padding: 4px 0 !important;
+        margin: 8px 0 6px !important;
+        border: none !important;
+        border-bottom: 1px solid #000 !important;
+        background-color: transparent !important;
+        border-radius: 0 !important;
+    }
+    .section-title h3 {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Tabela */
+    .table-container {
+        margin: 6px 0 !important;
+        overflow: visible !important;
+        box-shadow: none !important;
+        border: 1px solid #aaa !important;
+        page-break-inside: avoid !important;
+    }
+
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 7.5pt !important;
+    }
+
+    th, td {
+        padding: 3px 5px !important; /* Mínimo */
+        text-align: left !important;
+        border: 1px solid #bbb !important;
+        word-wrap: break-word !important;
+    }
+
+    th {
+        background-color: #eee !important;
+        color: #000 !important;
+        font-weight: bold !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    td input {
+        padding: 1px 0 !important;
+        font-size: 7.5pt !important;
+        border: none !important;
+        background: transparent !important;
+        width: 100% !important;
+    }
+
+    /* Assinaturas */
+    .signatures {
+        display: flex !important;
+        justify-content: space-around !important;
+        margin-top: 15px !important; /* Reduzido */
+        page-break-inside: avoid !important;
+    }
+
+    .signature-field {
+        width: auto !important;
+        max-width: 160px !important; /* Reduzido */
+        text-align: center !important;
+        font-size: 7.5pt !important;
+    }
+
+    .signature-line {
+        border-top: 1px solid #000 !important;
+        margin-bottom: 2px !important;
+        margin-top: 25px !important; /* Espaço reduzido */
+    }
+
+    /* Ocultar elementos não essenciais */
+    .progress-bar,
+    .tooltip,
+    .validation-message,
+    .secondary-button, /* Botão Add linha */
+    .form-actions, /* Botões Salvar/Visualizar/Limpar */
+    .pdf-preview, /* Modal */
+    .toast, /* Notificações */
+    script,
+    noscript {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        position: absolute !important;
+    }
+
+    /* Garante exibição de campos dinâmicos (se JS os manipula com display) */
+    .banco-field,
+    .pix-field {
+        /* Manter como estava - JS deve preparar para impressão se necessário */
+        /* display: block !important; */
+    }
+}
+
