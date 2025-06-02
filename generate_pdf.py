@@ -196,3 +196,4 @@ if __name__ == '__main__':
     output_file = '/home/ubuntu/formulario_adiantamento_10_linhas.pdf' # New output name
 
     create_pdf(sample_data, image_file, logo_file, output_file)
+
