@@ -659,10 +659,6 @@ td input:focus {
     }
 }
 
-.banco-field,
-.pix-field {
-    display: none;
-}
 
 /* ========================================
    RESPONSIVIDADE
