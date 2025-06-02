@@ -417,7 +417,6 @@ function mostrarToast(mensagem, tipo = "success") {
   }, 3000);
 }
 
-
 // Função para validar e gerar PDF
 function validarEGerarPDF() {
   if (validarFormulario()) {
@@ -459,6 +458,27 @@ function formatarData(dataStr) {
     console.error("Erro ao formatar data:", e);
     return "__/__/____";
   }
+}
+
+// Função para carregar imagem e converter para base64
+function carregarImagemComoBase64(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const dataURL = canvas.toDataURL('image/png');
+      resolve(dataURL);
+    };
+    img.onerror = function() {
+      reject(new Error('Erro ao carregar imagem'));
+    };
+    img.src = url;
+  });
 }
 
 // *** NOVA FUNÇÃO gerarPDF ***
@@ -525,55 +545,69 @@ async function gerarPDF() {
   const contentWidth = pageWidth - 2 * margin;
   let currentY = margin;
 
-  // Carregar Logo (assumindo que está em /home/ubuntu/upload/logo.png)
-  // Precisamos converter para Base64 ou garantir que o caminho seja acessível
-  // Como não podemos acessar o filesystem diretamente do JS, vamos pular o logo por enquanto
-  // ou pedir ao usuário para fornecer como Base64 se for crítico.
-  // Alternativa: Usar um placeholder
-  doc.setFontSize(10);
-  doc.setTextColor(150);
-  doc.text("[Logo PSR]", margin, currentY + 5);
-  doc.setTextColor(0);
+  try {
+    // Carregar e adicionar logo
+    const logoUrl = 'https://i.postimg.cc/v8nRpXB7/logo.png';
+    const logoBase64 = await carregarImagemComoBase64(logoUrl);
+    
+    // Adicionar logo (alinhada à esquerda)
+    const logoWidth = 40; // Ajuste conforme necessário
+    const logoHeight = 15; // Ajuste conforme necessário
+    doc.addImage(logoBase64, 'PNG', margin, currentY, logoWidth, logoHeight);
+    
+    // Caixa FOR_FIN / VERSÃO (mantém na mesma posição)
+    const boxWidth = 40;
+    const boxHeight = 10;
+    const boxX = pageWidth - margin - boxWidth;
+    const boxY = currentY + 2.5; // Centralizada verticalmente com a logo
+    doc.setLineWidth(0.3);
+    doc.setDrawColor(0);
+    doc.rect(boxX, boxY, boxWidth, boxHeight);
+    doc.setFontSize(8);
+    doc.text("FOR_FIN_02_02", boxX + boxWidth / 2, boxY + 4, { align: "center" });
+    doc.text("VERSÃO: 01", boxX + boxWidth / 2, boxY + 8, { align: "center" });
 
-  // Linha colorida abaixo do logo (simulada)
-  const logoHeight = 15; // Estimativa da altura do logo
-  currentY += logoHeight;
-  const lineColors = ["#FFD700", "#0056B3", "#DC3545"]; // Amarelo, Azul, Vermelho (aproximado)
-  const lineWidthTotal = 60;
-  let currentX = margin + 40; // Posição inicial da linha colorida
-  doc.setLineWidth(2);
-  doc.setDrawColor(lineColors[0]);
-  doc.line(currentX, currentY, currentX + lineWidthTotal * 0.6, currentY);
-  currentX += lineWidthTotal * 0.6;
-  doc.setDrawColor(lineColors[1]);
-  doc.line(currentX, currentY, currentX + lineWidthTotal * 0.3, currentY);
-  currentX += lineWidthTotal * 0.3;
-  doc.setDrawColor(lineColors[2]);
-  doc.line(currentX, currentY, currentX + lineWidthTotal * 0.1, currentY);
+    // Título Principal (na mesma altura da caixa de versão)
+    const tituloY = boxY + 6; // Centralizado verticalmente com a caixa
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("FORMULÁRIO DE ADIANTAMENTO À FORNECEDOR", pageWidth / 2, tituloY, {
+      align: "center",
+    });
+    doc.setFont("helvetica", "normal");
 
-  // Caixa FOR_FIN / VERSÃO
-  const boxWidth = 40;
-  const boxHeight = 10;
-  const boxX = pageWidth - margin - boxWidth;
-  const boxY = margin + 5; // Alinhado um pouco abaixo do topo
-  doc.setLineWidth(0.3);
-  doc.setDrawColor(0);
-  doc.rect(boxX, boxY, boxWidth, boxHeight);
-  doc.setFontSize(8);
-  doc.text("FOR_FIN_02_02", boxX + boxWidth / 2, boxY + 4, { align: "center" });
-  doc.text("VERSÃO: 01", boxX + boxWidth / 2, boxY + 8, { align: "center" });
+    // Atualizar currentY para após a logo/título
+    currentY = Math.max(currentY + logoHeight, boxY + boxHeight) + 3;
 
-  // Título Principal
-  currentY += 5; // Espaço após linha colorida
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text("FORMULÁRIO DE ADIANTAMENTO À FORNECEDOR", pageWidth / 2, currentY, {
-    align: "center",
-  });
-  doc.setFont("helvetica", "normal");
+  } catch (error) {
+    console.warn("Erro ao carregar logo, continuando sem ela:", error);
+    mostrarToast("Aviso: Logo não pôde ser carregada", "warning");
+    
+    // Fallback sem logo - apenas caixa e título
+    const boxWidth = 40;
+    const boxHeight = 10;
+    const boxX = pageWidth - margin - boxWidth;
+    const boxY = currentY;
+    doc.setLineWidth(0.3);
+    doc.setDrawColor(0);
+    doc.rect(boxX, boxY, boxWidth, boxHeight);
+    doc.setFontSize(8);
+    doc.text("FOR_FIN_02_02", boxX + boxWidth / 2, boxY + 4, { align: "center" });
+    doc.text("VERSÃO: 01", boxX + boxWidth / 2, boxY + 8, { align: "center" });
 
-  // Linha abaixo do título
-  currentY += 5;
+    // Título Principal
+    const tituloY = boxY + 6;
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("FORMULÁRIO DE ADIANTAMENTO À FORNECEDOR", pageWidth / 2, tituloY, {
+      align: "center",
+    });
+    doc.setFont("helvetica", "normal");
+
+    currentY = boxY + boxHeight + 3;
+  }
+
+  // Linha abaixo do cabeçalho
   doc.setLineWidth(0.5);
   doc.line(margin, currentY, pageWidth - margin, currentY);
   currentY += 8; // Espaço antes dos campos
@@ -619,7 +653,6 @@ async function gerarPDF() {
       return y + h + 5; // Retorna a próxima posição Y
   }
 
-
   // Coluna 1
   yCol1 = drawField(col1X, yCol1, colWidth, "CÓDIGO FORNECEDOR:", dados.codigoFornecedor);
   yCol1 = drawField(col1X, yCol1, colWidth, "FORNECEDOR:", dados.fornecedor);
@@ -628,264 +661,189 @@ async function gerarPDF() {
   yCol1 = drawField(col1X, yCol1, colWidth, "DATA PARA PAGAMENTO:", formatarData(dados.dataPagamento));
   yCol1 = drawField(col1X, yCol1, colWidth, "ORDEM DE COMPRA:", dados.ordemCompra);
 
-  // Campo Valor (com R$)
+ // Campo Valor (com R$) - continuação
   doc.setFont("helvetica", "bold");
   doc.text("VALOR:", col1X, yCol1 + labelOffset);
   doc.setFont("helvetica", "normal");
   doc.line(col1X, yCol1 + fieldHeight - lineOffset, col1X + colWidth, yCol1 + fieldHeight - lineOffset);
   doc.text("R$", col1X + 2, yCol1 + valueOffsetY);
-  doc.text(formatarMoeda(dados.valor).replace("R$","").trim(), col1X + 8, yCol1 + valueOffsetY);
+  doc.text(formatarMoeda(dados.valor).replace("R$ ", ""), col1X + 10, yCol1 + valueOffsetY);
   yCol1 += fieldHeight + 3;
+
+  // Coluna 2 - Finalidade
+  yCol2 = drawBoxField(col2X, yCol2, col2Width, 20, "FINALIDADE:", dados.finalidade, 3);
+
+  // Dados para Pagamento
+  yCol2 += 5;
+  doc.setFont("helvetica", "bold");
+  doc.text("DADOS PARA PAGAMENTO:", col2X, yCol2);
+  doc.setFont("helvetica", "normal");
+  yCol2 += 5;
 
   // Forma de Pagamento
-  doc.setFont("helvetica", "bold");
-  doc.text("FORMA DE PAGAMENTO:", col1X, yCol1 + labelOffset);
-  doc.setFont("helvetica", "normal");
-  const checkX1 = col1X + 45;
-  const checkY = yCol1 - 1;
-  const checkSize = 4;
-  doc.rect(checkX1, checkY, checkSize, checkSize);
-  doc.text("PIX/TED", checkX1 + checkSize + 2, checkY + checkSize - 1);
-  const checkX2 = checkX1 + 30;
-  doc.rect(checkX2, checkY, checkSize, checkSize);
-  doc.text("BOLETO", checkX2 + checkSize + 2, checkY + checkSize - 1);
-  if (dados.formaPagamento === "PIX/TED") {
-    doc.setFont("zapfdingbats", "bold");
-    doc.text("\u2713", checkX1 + 0.5, checkY + checkSize - 0.5); // Checkmark
-    doc.setFont("helvetica", "normal");
-  } else if (dados.formaPagamento === "BOLETO") {
-    doc.setFont("zapfdingbats", "bold");
-    doc.text("\u2713", checkX2 + 0.5, checkY + checkSize - 0.5); // Checkmark
-    doc.setFont("helvetica", "normal");
-  }
-  yCol1 += fieldHeight + 3;
+  const formaPagTexto = dados.formaPagamento === "transferencia" ? "TRANSFERÊNCIA BANCÁRIA" : 
+                       dados.formaPagamento === "pix" ? "PIX" : "";
+  yCol2 = drawField(col2X, yCol2, col2Width, "FORMA DE PAGAMENTO:", formaPagTexto);
+  yCol2 = drawField(col2X, yCol2, col2Width, "BENEFICIÁRIO:", dados.beneficiario);
+  yCol2 = drawField(col2X, yCol2, col2Width, "CPF/CNPJ:", dados.cpfCnpj);
 
-  yCol1 = drawField(col1X, yCol1, colWidth, "SOLICITANTE:", dados.solicitante);
-  yCol1 = drawField(col1X, yCol1, colWidth, "DEPARTAMENTO:", dados.departamento);
-  yCol1 = drawField(col1X, yCol1, colWidth, "DATA LIMITE PARA PRESTAÇÃO DE CONTAS:", formatarData(dados.dataLimitePrestacao));
-
-  // Coluna 2
-  const finalidadeHeight = 30;
-  yCol2 = drawBoxField(col2X, yCol2, col2Width, finalidadeHeight, "FINALIDADE:", dados.finalidade, 5);
-
-  // Caixa Dados para Pagamento
-  const dadosPgtoY = yCol2;
-  const dadosPgtoHeight = 45; // Altura estimada para caber os campos
-  doc.rect(col2X, dadosPgtoY, col2Width, dadosPgtoHeight);
-  doc.setFont("helvetica", "bold");
-  doc.text("DADOS PARA PAGAMENTO:", col2X + 2, dadosPgtoY + 4);
-  doc.setFont("helvetica", "normal");
-  let yDados = dadosPgtoY + 8;
-  const fieldWidthDados = col2Width - 4; // Largura interna da caixa
-  const labelIndentDados = col2X + 2;
-  const valueIndentDados = col2X + 25; // Indentação para valores
-  const valueWidthDados = col2Width - 27;
-
-  function drawDadosField(y, label, value) {
-      doc.setFontSize(7);
-      doc.text(label, labelIndentDados, y + 3);
-      doc.line(valueIndentDados - 2, y + 4, col2X + col2Width - 2, y + 4);
-      if(value) doc.text(String(value), valueIndentDados, y + 3);
-      return y + 5;
+  if (dados.formaPagamento === "transferencia") {
+    yCol2 = drawField(col2X, yCol2, col2Width, "BANCO:", dados.banco);
+    yCol2 = drawField(col2X, yCol2, col2Width, "AGÊNCIA:", dados.agencia);
+    yCol2 = drawField(col2X, yCol2, col2Width, "CONTA:", dados.conta);
+    yCol2 = drawField(col2X, yCol2, col2Width, "TIPO CONTA:", dados.tipoConta);
+  } else if (dados.formaPagamento === "pix") {
+    yCol2 = drawField(col2X, yCol2, col2Width, "CHAVE PIX:", dados.chavePix);
   }
 
-  yDados = drawDadosField(yDados, "BENEFICIÁRIO:", dados.beneficiario);
-  yDados = drawDadosField(yDados, "CPF / CNPJ:", dados.cpfCnpj);
-  yDados = drawDadosField(yDados, "BANCO:", dados.banco);
-  yDados = drawDadosField(yDados, "AGÊNCIA:", dados.agencia);
-  yDados = drawDadosField(yDados, "CONTA:", dados.conta);
-  yDados = drawDadosField(yDados, "TIPO DE CONTA:", dados.tipoConta);
-  yDados = drawDadosField(yDados, "CHAVE PIX:", dados.chavePix);
-  yCol2 = dadosPgtoY + dadosPgtoHeight + 5;
+  // Ajustar currentY para a maior coluna
+  currentY = Math.max(yCol1, yCol2) + 10;
 
-  // --- Seção Adiantamentos em Aberto ---
-  currentY = Math.max(yCol1, yCol2) + 5; // Alinha início da seção abaixo da coluna mais longa
-  doc.setLineWidth(0.5);
-  doc.line(margin, currentY, pageWidth - margin, currentY);
-  currentY += 5;
-  doc.setFontSize(9);
+  // --- Seção de Adiantamentos ---
   doc.setFont("helvetica", "bold");
-  doc.text("ADIANTAMENTOS EM ABERTO", pageWidth / 2, currentY, { align: "center" });
+  doc.text("ADIANTAMENTOS ANTERIORES REFERENTE A ESTA ORDEM DE COMPRA:", margin, currentY);
   doc.setFont("helvetica", "normal");
   currentY += 8;
 
-  // Tabela Adiantamentos
-  const tableColWidths = [contentWidth * 0.4, contentWidth * 0.4, contentWidth * 0.2];
-  const tableHeaders = ["ORDEM DE COMPRA", "DATA LIMITE PRESTAÇÃO DE CONTAS", "VALOR EM ABERTO"];
-  const tableRowHeight = 6;
-  const tableHeaderY = currentY;
-  let tableX = margin;
+  // Cabeçalho da tabela
+  const tableX = margin;
+  const tableWidth = contentWidth;
+  const col1Width = tableWidth * 0.4; // Ordem de Compra
+  const col2Width = tableWidth * 0.3; // Data Limite
+  const col3Width = tableWidth * 0.3; // Valor
+  const rowHeight = 8;
 
-  // Desenhar Cabeçalho
-  doc.setFontSize(7);
-  doc.setFont("helvetica", "bold");
-  for (let i = 0; i < tableHeaders.length; i++) {
-    doc.rect(tableX, tableHeaderY, tableColWidths[i], tableRowHeight);
-    doc.text(tableHeaders[i], tableX + 2, tableHeaderY + 4);
-    tableX += tableColWidths[i];
-  }
-  currentY += tableRowHeight;
-
-  // Desenhar Linhas da Tabela (mínimo 4 linhas como no template)
-  doc.setFontSize(8);
-  doc.setFont("helvetica", "normal");
-  const numRowsToDraw = Math.max(4, dados.adiantamentos.length);
-  for (let i = 0; i < numRowsToDraw; i++) {
-    tableX = margin;
-    const adiantamento = dados.adiantamentos[i]; // Pode ser undefined
-    for (let j = 0; j < tableColWidths.length; j++) {
-      doc.rect(tableX, currentY, tableColWidths[j], tableRowHeight);
-      let cellValue = "";
-      if (adiantamento) {
-          if (j === 0) cellValue = adiantamento.ordemCompra;
-          else if (j === 1) cellValue = formatarData(adiantamento.dataLimite);
-          else if (j === 2) cellValue = adiantamento.valor; // Já formatado
-      }
-      doc.text(String(cellValue), tableX + 2, currentY + 4);
-      tableX += tableColWidths[j];
-    }
-    currentY += tableRowHeight;
-  }
-
-  // --- Assinaturas ---
-  currentY += 15; // Espaço antes das assinaturas
-  const signatureY = Math.min(currentY, pageHeight - 30); // Garante que não saia da página
-  const signatureLineLength = 60;
-  const signatureCol1X = margin + contentWidth * 0.15;
-  const signatureCol2X = pageWidth - margin - contentWidth * 0.15 - signatureLineLength;
-
+  // Desenhar cabeçalho
+  doc.setFillColor(240, 240, 240);
+  doc.rect(tableX, currentY, tableWidth, rowHeight, 'F');
   doc.setLineWidth(0.3);
-  doc.line(signatureCol1X, signatureY, signatureCol1X + signatureLineLength, signatureY);
-  doc.text("Solicitante", signatureCol1X + signatureLineLength / 2, signatureY + 4, { align: "center" });
+  doc.rect(tableX, currentY, col1Width, rowHeight);
+  doc.rect(tableX + col1Width, currentY, col2Width, rowHeight);
+  doc.rect(tableX + col1Width + col2Width, currentY, col3Width, rowHeight);
 
-  doc.line(signatureCol2X, signatureY, signatureCol2X + signatureLineLength, signatureY);
-  doc.text("Controladoria", signatureCol2X + signatureLineLength / 2, signatureY + 4, { align: "center" });
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7);
+  doc.text("ORDEM DE COMPRA", tableX + col1Width/2, currentY + 5, { align: "center" });
+  doc.text("DATA LIMITE PRESTAÇÃO", tableX + col1Width + col2Width/2, currentY + 5, { align: "center" });
+  doc.text("VALOR", tableX + col1Width + col2Width + col3Width/2, currentY + 5, { align: "center" });
+  currentY += rowHeight;
+
+  // Desenhar linhas de dados (máximo 5 linhas visíveis)
+  doc.setFont("helvetica", "normal");
+  const maxLinhasVisiveis = 5;
+
+  for (let i = 0; i < maxLinhasVisiveis; i++) {
+    const adiantamento = dados.adiantamentos[i];
+    
+    doc.rect(tableX, currentY, col1Width, rowHeight);
+    doc.rect(tableX + col1Width, currentY, col2Width, rowHeight);
+    doc.rect(tableX + col1Width + col2Width, currentY, col3Width, rowHeight);
+
+    if (adiantamento) {
+      doc.text(adiantamento.ordemCompra || "", tableX + 2, currentY + 5);
+      doc.text(formatarData(adiantamento.dataLimite) || "", tableX + col1Width + 2, currentY + 5);
+      doc.text(adiantamento.valor || "", tableX + col1Width + col2Width + 2, currentY + 5);
+    }
+    
+    currentY += rowHeight;
+  }
+
+  currentY += 10;
+
+  // --- Seções finais ---
+  // Solicitante e Departamento
+  const infoY = currentY;
+  yCol1 = drawField(col1X, infoY, colWidth, "SOLICITANTE:", dados.solicitante);
+  yCol2 = drawField(col2X, infoY, col2Width, "DEPARTAMENTO:", dados.departamento);
+  
+  currentY = Math.max(yCol1, yCol2) + 5;
+
+  // Data limite para prestação de contas
+  currentY = drawField(margin, currentY, contentWidth, 
+    "DATA LIMITE PARA PRESTAÇÃO DE CONTAS:", formatarData(dados.dataLimitePrestacao));
+
+  currentY += 10;
+
+  // Assinaturas
+  const assinaturaY = currentY;
+  const assinaturaWidth = (contentWidth - 20) / 3;
+  
+  // Solicitante
+  doc.line(margin, assinaturaY, margin + assinaturaWidth, assinaturaY);
+  doc.setFontSize(7);
+  doc.text("SOLICITANTE", margin + assinaturaWidth/2, assinaturaY + 4, { align: "center" });
+  
+  // Supervisor
+  const supervisorX = margin + assinaturaWidth + 10;
+  doc.line(supervisorX, assinaturaY, supervisorX + assinaturaWidth, assinaturaY);
+  doc.text("SUPERVISOR", supervisorX + assinaturaWidth/2, assinaturaY + 4, { align: "center" });
+  
+  // Financeiro
+  const financeiroX = supervisorX + assinaturaWidth + 10;
+  doc.line(financeiroX, assinaturaY, financeiroX + assinaturaWidth, assinaturaY);
+  doc.text("FINANCEIRO", financeiroX + assinaturaWidth/2, assinaturaY + 4, { align: "center" });
+
+  currentY = assinaturaY + 15;
+
+  // Rodapé com data/hora de geração
+  doc.setFontSize(6);
+  doc.setTextColor(128, 128, 128);
+  const agora = new Date();
+  const dataHoraGeracao = `Gerado em: ${agora.toLocaleString('pt-BR')}`;
+  doc.text(dataHoraGeracao, pageWidth - margin, pageHeight - 5, { align: "right" });
 
   // --- Finalização ---
-  pdfDoc = doc; // Armazena o documento para download
-
-  // Exibir preview do PDF
-  try {
-      const pdfData = doc.output("datauristring");
-      const pdfContainer = document.getElementById("pdfContainer");
-      if (pdfContainer) {
-          pdfContainer.innerHTML = `<embed width="100%" height="100%" src="${pdfData}" type="application/pdf">`;
-          // Mostrar o modal de preview
-          document.getElementById("pdfPreview").classList.add("active");
-          mostrarToast("PDF gerado com sucesso!", "success");
-      } else {
-          console.error("Elemento #pdfContainer não encontrado.");
-          mostrarToast("Erro ao exibir preview do PDF.", "error");
-          // Oferecer download direto como fallback
-          downloadPDF();
-      }
-  } catch (e) {
-      console.error("Erro ao gerar Data URI do PDF:", e);
-      mostrarToast("Erro ao gerar preview do PDF.", "error");
-  }
+  pdfDoc = doc;
+  mostrarPreviewPDF();
+  mostrarToast("PDF gerado com sucesso!", "success");
 }
 
+// Função para mostrar preview do PDF
+function mostrarPreviewPDF() {
+  if (!pdfDoc) return;
+  
+  const pdfPreview = document.getElementById("pdfPreview");
+  const pdfViewer = document.getElementById("pdfViewer");
+  
+  // Gerar blob do PDF
+  const pdfBlob = pdfDoc.output('blob');
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+  
+  // Configurar iframe
+  pdfViewer.src = pdfUrl;
+  pdfPreview.style.display = "flex";
+  
+  // Adicionar animação
+  setTimeout(() => {
+    pdfPreview.classList.add("show");
+  }, 10);
+}
 
-// Função para fechar o preview do PDF
+// Função para fechar preview do PDF
 function fecharPreviewPDF() {
-  document.getElementById("pdfPreview").classList.remove("active");
-  const pdfContainer = document.getElementById("pdfContainer");
-  if(pdfContainer) pdfContainer.innerHTML = ""; // Limpa o embed para liberar memória
-}
-
-// Função para baixar o PDF
-function downloadPDF() {
-  if (pdfDoc) {
-    const fornecedor = document.getElementById("fornecedor").value || "fornecedor";
-    const dataEmissao = document.getElementById("dataEmissao").value || new Date().toISOString().split("T")[0];
-    // Limpa caracteres inválidos para nome de arquivo
-    const fornecedorLimpo = fornecedor.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    const nomeArquivo = `Adiantamento_${fornecedorLimpo}_${dataEmissao}.pdf`;
-
-    try {
-        pdfDoc.save(nomeArquivo);
-        mostrarToast("PDF baixado com sucesso!", "success");
-    } catch (e) {
-        console.error("Erro ao salvar PDF:", e);
-        mostrarToast("Erro ao baixar o PDF.", "error");
+  const pdfPreview = document.getElementById("pdfPreview");
+  const pdfViewer = document.getElementById("pdfViewer");
+  
+  pdfPreview.classList.remove("show");
+  
+  setTimeout(() => {
+    pdfPreview.style.display = "none";
+    // Limpar URL para liberar memória
+    if (pdfViewer.src) {
+      URL.revokeObjectURL(pdfViewer.src);
+      pdfViewer.src = "";
     }
+  }, 300);
+}
 
-  } else {
-      mostrarToast("Nenhum PDF gerado para baixar.", "warning");
+// Função para download do PDF
+function downloadPDF() {
+  if (!pdfDoc) {
+    mostrarToast("Nenhum PDF gerado para download", "error");
+    return;
   }
-}
-
-// Adiciona um container para as notificações Toast no HTML se não existir
-if (!document.getElementById("toastContainer")) {
-    const container = document.createElement("div");
-    container.id = "toastContainer";
-    container.style.position = "fixed";
-    container.style.top = "20px";
-    container.style.right = "20px";
-    container.style.zIndex = "1000";
-    document.body.appendChild(container);
-}
-
-// Adiciona o HTML do Modal de Preview se não existir
-if (!document.getElementById("pdfPreview")) {
-    const modal = document.createElement("div");
-    modal.id = "pdfPreview";
-    modal.className = "modal-overlay"; // Use classes CSS existentes ou defina estilos
-    modal.innerHTML = `
-        <div class="modal-content" style="width: 80%; height: 80%; background: white; padding: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative;">
-            <button id="closePdfPreview" style="position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-size: 16px; line-height: 25px; text-align: center;">×</button>
-            <div id="pdfContainer" style="width: 100%; height: calc(100% - 40px); margin-top: 30px;"></div>
-            <button id="downloadPdfBtn" style="position: absolute; bottom: 10px; right: 10px; padding: 8px 15px; background-color: #0056b3; color: white; border: none; border-radius: 4px; cursor: pointer;">Baixar PDF</button>
-        </div>
-    `;
-    document.body.appendChild(modal);
-
-    // Adiciona estilos básicos para o modal se não estiverem no CSS
-    const style = document.createElement('style');
-    style.textContent = `
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 999;
-        }
-        .modal-overlay.active {
-            display: flex;
-        }
-        /* Estilos para Toast (simplificado) */
-        .toast {
-            background-color: #333;
-            color: #fff;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            min-width: 250px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            opacity: 0;
-            transform: translateX(100%);
-            transition: all 0.5s ease-in-out;
-            position: relative;
-            overflow: hidden;
-        }
-        .toast.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        .toast.success { background-color: #28a745; }
-        .toast.error { background-color: #dc3545; }
-        .toast.warning { background-color: #ffc107; color: #333; }
-        .toast.info { background-color: #17a2b8; }
-        .toast-icon { margin-right: 10px; }
-        .toast-progress {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 4px;
-            width: 0;
-            background-color: rgba(255,255,255,0.7);
-            transition: width 3s linear;
-        }
-    `;
-    document.head.appendChild(style);
-
-    // Re-adiciona listeners para botões do modal recém-criado
-    document.getElementById("closePdfPreview").addEventListener("click", fecharPreviewPDF);
-    document.getElementById("downloadPdfBtn").addEventListener("click", downloadPDF);
+  
+  const filename = `adiantamento_fornecedor_${new Date().toISOString().split('T')[0]}.pdf`;
+  pdfDoc.save(filename);
+  mostrarToast("PDF baixado com sucesso!", "success");
 }
