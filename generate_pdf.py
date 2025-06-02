@@ -16,6 +16,7 @@ def format_currency(value_str):
         # Replace comma with dot for float conversion
         numeric_value = float(cleaned_value.replace(',', '.'))
         # Format as BRL currency
+        # Use a temporary placeholder for comma to avoid issues with thousand separator
         return f"R$ {numeric_value:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
     except ValueError:
         return "R$ 0,00" # Return default if conversion fails
@@ -29,7 +30,7 @@ def format_date(date_str):
     except ValueError:
         return '__/__/____'
 
-def create_pdf(data, image_path, output_path):
+def create_pdf(data, image_path, logo_path, output_path):
     # Image dimensions in pixels: 862x1316
     # Using pixels directly as points (1 pt = 1/72 inch)
     img_w_pt = 862
@@ -39,11 +40,19 @@ def create_pdf(data, image_path, output_path):
     pdf.add_page()
     pdf.set_auto_page_break(auto=False, margin=0)
 
-    # Add background image
+    # Add background image (the form template)
     pdf.image(image_path, x=0, y=0, w=img_w_pt, h=img_h_pt)
 
+    # Add the new logo to the header
+    # Coordinates and size estimated based on the original template image
+    # Adjust x, y, w, h as needed for precise placement
+    logo_x = 30  # Points from left
+    logo_y = 20  # Points from top
+    logo_w = 200 # Width in points (adjust as needed)
+    # Height will be calculated automatically to maintain aspect ratio if h=0
+    pdf.image(logo_path, x=logo_x, y=logo_y, w=logo_w, h=0)
+
     # Set font
-    # Using a standard font first. If specific font needed, install/add it.
     try:
         pdf.set_font('Helvetica', '', 10)
     except RuntimeError:
@@ -52,7 +61,6 @@ def create_pdf(data, image_path, output_path):
             pdf.set_font('Arial', '', 10)
         except RuntimeError:
              print("Arial font not found. Using default font.")
-             # FPDF will use a default if others fail, but might not look right.
              pass # Continue with default
 
     pdf.set_text_color(0, 0, 0)
@@ -179,7 +187,9 @@ if __name__ == '__main__':
         ]
     }
 
-    image_file = '/home/ubuntu/upload/image.png'
-    output_file = '/home/ubuntu/formulario_adiantamento.pdf'
+    image_file = '/home/ubuntu/upload/image.png' # The form background template
+    logo_file = '/home/ubuntu/assets/logo_cabecalho.png' # The new logo
+    output_file = '/home/ubuntu/formulario_adiantamento_com_logo.pdf'
 
-    create_pdf(sample_data, image_file, output_file)
+    create_pdf(sample_data, image_file, logo_file, output_file)
+
