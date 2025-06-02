@@ -36,7 +36,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   inicializarMascaras();
 
-  document.querySelector(".form-container").classList.add("fade-in");
+document.querySelectorAll('.valor-adiantamento').forEach((input) => {
+    input.addEventListener("input", function (e) {
+        let valor = e.target.value.replace(/\D/g, "");
+        valor = (parseInt(valor, 10) / 100).toFixed(2) + "";
+        valor = valor.replace(".", ",");
+        valor = valor.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+        e.target.value = valor === "NaN" || valor === "0,00" ? "" : valor;
+    });
 });
 
 function atualizarDataLimite() {
@@ -252,14 +259,13 @@ function adicionarLinhaTabela() {
       return;
   }
   const novaLinha = document.createElement("tr");
-
   novaLinha.innerHTML = `
         <td><input type="text" name="adiantamentoOC[]" class="input-animated"></td>
         <td><input type="date" name="adiantamentoData[]" class="input-animated"></td>
         <td>
             <div class="input-prefix">
                 <span>R$</span>
-                <input type="number" name="adiantamentoValor[]" step="0.01" min="0" class="input-animated" placeholder="0,00">
+                <input type="text" name="adiantamentoValor[]" class="input-animated valor-adiantamento" placeholder="0,00">
             </div>
         </td>
     `;
@@ -267,6 +273,17 @@ function adicionarLinhaTabela() {
   tbody.appendChild(novaLinha);
   novaLinha.classList.add("fade-in");
   mostrarToast("Nova linha adicionada", "success");
+
+  // Inicializa máscara no novo campo
+  novaLinha.querySelectorAll('.valor-adiantamento').forEach((input) => {
+      input.addEventListener("input", function (e) {
+          let valor = e.target.value.replace(/\D/g, "");
+          valor = (parseInt(valor, 10) / 100).toFixed(2) + "";
+          valor = valor.replace(".", ",");
+          valor = valor.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+          e.target.value = valor === "NaN" || valor === "0,00" ? "" : valor;
+      });
+  });
 }
 
 function limparFormulario() {
