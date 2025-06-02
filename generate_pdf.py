@@ -190,10 +190,7 @@ if __name__ == '__main__':
             {'oc': 'OC-000', 'data': '2025-05-28', 'valor': '77,88'}
         ]
     }
-
-    image_file = '/home/ubuntu/assets/image_no_small_logo.png' # Use edited background
-    logo_file = '/home/ubuntu/assets/logo_cabecalho.png'
-    output_file = '/home/ubuntu/formulario_adiantamento_10_linhas.pdf' # New output name
+    output_file = '/home/ubuntu/formulario_adiantamento.pdf' # New output name
 
     create_pdf(sample_data, image_file, logo_file, output_file)
 
