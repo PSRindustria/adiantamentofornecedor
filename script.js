@@ -309,9 +309,9 @@ function atualizarProgressoFormulario() {
 // Função para adicionar linha na tabela de adiantamentos
 function adicionarLinhaTabela() {
   const tbody = document.querySelector("#adiantamentosTable tbody");
-  // Limitar a 3 linhas extras (4 no total com a primeira)
-  if (tbody.rows.length >= 4) {
-      mostrarToast("Máximo de 4 linhas de adiantamento atingido.", "warning");
+  // Limitar a 9 linhas extras (10 no total com a primeira)
+  if (tbody.rows.length >= 10) {
+      mostrarToast("Máximo de 10 linhas de adiantamento atingido.", "warning");
       return;
   }
   const novaLinha = document.createElement("tr");
