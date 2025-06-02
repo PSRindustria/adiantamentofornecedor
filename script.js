@@ -550,14 +550,14 @@ async function gerarPDF() {
   doc.rect(checkX2, checkY, checkSize, checkSize);
   doc.text("BOLETO", checkX2 + checkSize + 2, checkY + checkSize - 1);
   if (dados.formaPagamento === "PIX/TED") {
-    doc.setFont("zapfdingbats", "bold");
-    doc.text("\u2713", checkX1 + 0.5, checkY + checkSize - 0.5);
-    doc.setFont("helvetica", "normal");
-  } else if (dados.formaPagamento === "BOLETO") {
-    doc.setFont("zapfdingbats", "bold");
-    doc.text("\u2713", checkX2 + 0.5, checkY + checkSize - 0.5);
-    doc.setFont("helvetica", "normal");
-  }
+  doc.setFont("helvetica", "bold");
+  doc.text("X", checkX1 + 1.4, checkY + checkSize - 0.8);
+  doc.setFont("helvetica", "normal");
+} else if (dados.formaPagamento === "BOLETO") {
+  doc.setFont("helvetica", "bold");
+  doc.text("X", checkX2 + 1.4, checkY + checkSize - 0.8);
+  doc.setFont("helvetica", "normal");
+}
   yCol1 += fieldHeight + 3;
 
   yCol1 = drawField(col1X, yCol1, colWidth, "SOLICITANTE:", dados.solicitante);
