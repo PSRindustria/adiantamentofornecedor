@@ -122,18 +122,6 @@ body {
         var(--warning-color) 100%);
 }
 
-.logo-area {
-    flex: 0 0 140px;
-    margin-right: var(--spacing-lg);
-}
-
-.logo-area img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    filter: brightness(0) invert(1);
-}
-
 .title {
     flex: 1;
     text-align: center;
