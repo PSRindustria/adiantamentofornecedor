@@ -4,76 +4,47 @@ let formValidated = false;
 
 // Função para inicializar o formulário
 document.addEventListener("DOMContentLoaded", function () {
-  // Definir data de emissão como data atual
   const hoje = new Date();
   const dataFormatada = hoje.toISOString().split("T")[0];
   document.getElementById("dataEmissao").value = dataFormatada;
 
-  // Calcular data limite para prestação de contas (30 dias após a data atual)
   atualizarDataLimite();
 
-  // Adicionar event listeners
-  document
-    .getElementById("gerarPdfBtn")
-    .addEventListener("click", validarEGerarPDF);
-  document
-    .getElementById("closePdfPreview")
-    .addEventListener("click", fecharPreviewPDF);
-  document
-    .getElementById("downloadPdfBtn")
-    .addEventListener("click", downloadPDF);
-  document
-    .getElementById("limparFormBtn")
-    .addEventListener("click", limparFormulario);
-  document
-    .getElementById("addRowBtn")
-    .addEventListener("click", adicionarLinhaTabela);
+  document.getElementById("gerarPdfBtn").addEventListener("click", validarEGerarPDF);
+  document.getElementById("closePdfPreview").addEventListener("click", fecharPreviewPDF);
+  document.getElementById("downloadPdfBtn").addEventListener("click", downloadPDF);
+  document.getElementById("limparFormBtn").addEventListener("click", limparFormulario);
+  document.getElementById("addRowBtn").addEventListener("click", adicionarLinhaTabela);
 
-  // Event listener para atualizar data limite quando a data de emissão mudar
-  document
-    .getElementById("dataEmissao")
-    .addEventListener("change", atualizarDataLimite);
+  document.getElementById("dataEmissao").addEventListener("change", atualizarDataLimite);
 
-  // Event listener para mostrar/esconder campos de pagamento baseado na forma de pagamento
   document.querySelectorAll("input[name=\"formaPagamento\"]").forEach((radio) => {
     radio.addEventListener("change", atualizarCamposPagamento);
   });
 
-  // Adicionar validação em tempo real para todos os campos
   const camposValidaveis = document.querySelectorAll("input, textarea, select");
   camposValidaveis.forEach((campo) => {
     campo.addEventListener("blur", function () {
       validarCampo(this);
       atualizarProgressoFormulario();
     });
-
     campo.addEventListener("input", function () {
-      // Remover classe de erro ao digitar
       this.classList.remove("input-error");
-      // Atualizar progresso ao digitar também
       atualizarProgressoFormulario();
     });
   });
 
-  // Inicializar máscaras para campos específicos
   inicializarMascaras();
 
-  // Inicializar campos de pagamento (garantir que estejam visíveis se necessário)
-  // A remoção do CSS já deve garantir a visibilidade inicial
-  // atualizarCamposPagamento(); // Pode não ser mais necessário chamar aqui
-
-  // Adicionar animação de entrada
   document.querySelector(".form-container").classList.add("fade-in");
 });
 
-// Função para atualizar a data limite com base na data de emissão
 function atualizarDataLimite() {
   try {
     const dataEmissaoStr = document.getElementById("dataEmissao").value;
-    if (!dataEmissaoStr) return; // Não faz nada se a data de emissão estiver vazia
-    // Adiciona hora para evitar problemas de fuso horário
+    if (!dataEmissaoStr) return;
     const dataEmissao = new Date(dataEmissaoStr + "T00:00:00");
-    if (isNaN(dataEmissao.getTime())) return; // Data inválida
+    if (isNaN(dataEmissao.getTime())) return;
 
     const dataLimite = new Date(dataEmissao);
     dataLimite.setDate(dataLimite.getDate() + 30);
@@ -85,21 +56,9 @@ function atualizarDataLimite() {
   }
 }
 
-// Função para atualizar campos de pagamento baseado na forma selecionada
-// Esta função pode ser removida ou simplificada se os campos devem estar sempre visíveis
-function atualizarCamposPagamento() {
-  // Como removemos o CSS que ocultava, esta função não é mais estritamente necessária
-  // para a visibilidade, mas pode ser usada para lógica futura se necessário.
-  // console.log("Atualizando campos de pagamento...");
-  // const formaPagamento = document.querySelector("input[name=\"formaPagamento\"]:checked")?.value;
-  // const camposBancarios = document.querySelectorAll(".banco-field");
-  // const camposPix = document.querySelectorAll(".pix-field");
-  // // Lógica para mostrar/ocultar pode ser reativada se desejado
-}
+function atualizarCamposPagamento() {}
 
-// Função para inicializar máscaras de input
 function inicializarMascaras() {
-  // Máscara para CNPJ
   const cnpjInput = document.getElementById("cnpjFornecedor");
   if (cnpjInput) {
     cnpjInput.addEventListener("input", function (e) {
@@ -121,13 +80,11 @@ function inicializarMascaras() {
     });
   }
 
-  // Máscara para CPF/CNPJ
   const cpfCnpjInput = document.getElementById("cpfCnpj");
   if (cpfCnpjInput) {
     cpfCnpjInput.addEventListener("input", function (e) {
       let valor = e.target.value.replace(/\D/g, "");
       if (valor.length <= 11) {
-        // CPF: XXX.XXX.XXX-XX
         valor = valor.substring(0, 11);
         if (valor.length > 9) {
           valor = valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2})$/, "$1.$2.$3-$4");
@@ -137,7 +94,6 @@ function inicializarMascaras() {
           valor = valor.replace(/^(\d{3})(\d{0,3})$/, "$1.$2");
         }
       } else {
-        // CNPJ: XX.XXX.XXX/XXXX-XX
         valor = valor.substring(0, 14);
         if (valor.length > 12) {
           valor = valor.replace(
@@ -156,7 +112,6 @@ function inicializarMascaras() {
     });
   }
 
-  // Máscara para Valor (Formato Moeda BRL)
   const valorInput = document.getElementById("valor");
   if (valorInput) {
     valorInput.addEventListener("input", function (e) {
@@ -164,24 +119,20 @@ function inicializarMascaras() {
       valor = (parseInt(valor, 10) / 100).toFixed(2) + "";
       valor = valor.replace(".", ",");
       valor = valor.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
-      // Previne NaN se o campo estiver vazio
       e.target.value = valor === "NaN" || valor === "0,00" ? "" : valor;
     });
   }
 }
 
-// Função para validar um campo específico
 function validarCampo(campo) {
   const id = campo.id;
   const valor = campo.value.trim();
   const mensagemValidacao = document.getElementById(`${id}-validation`);
   let valido = true;
 
-  // Limpar validação anterior
   campo.classList.remove("input-error", "input-success");
   if (mensagemValidacao) mensagemValidacao.textContent = "";
 
-  // Validações obrigatórias
   const obrigatorios = [
     "codigoFornecedor",
     "fornecedor",
@@ -197,7 +148,6 @@ function validarCampo(campo) {
     valido = false;
   }
 
-  // Validações específicas
   if (valido && id === "cnpjFornecedor" && !validarCNPJ(valor)) {
     if (mensagemValidacao) mensagemValidacao.textContent = "CNPJ inválido";
     valido = false;
@@ -211,27 +161,20 @@ function validarCampo(campo) {
     }
   }
 
-  // Atualizar estilo do campo
   if (!valido) {
     campo.classList.add("input-error");
   } else if (valor) {
-    // Adiciona classe de sucesso apenas se for válido e tiver valor
     campo.classList.add("input-success");
   }
 
   return valido;
 }
 
-// Função para validar CNPJ (simplificada para aceitar o formato digitado)
 function validarCNPJ(cnpj) {
-  // Remove caracteres não numéricos
   const numeros = cnpj.replace(/\D/g, "");
-  // Verifica se tem 14 dígitos
   return numeros.length === 14;
-  // A validação completa do dígito verificador pode ser reativada se necessário
 }
 
-// Função para validar todo o formulário
 function validarFormulario() {
   const camposValidaveis = document.querySelectorAll(
     "#adiantamentoForm input:not([type=\"radio\"]), #adiantamentoForm textarea, #adiantamentoForm select"
@@ -239,7 +182,6 @@ function validarFormulario() {
   let formValido = true;
 
   camposValidaveis.forEach((campo) => {
-    // Não valida campos que não são obrigatórios e estão vazios
     const obrigatorios = [
       "codigoFornecedor",
       "fornecedor",
@@ -256,7 +198,6 @@ function validarFormulario() {
     }
   });
 
-  // Validar forma de pagamento
   const formaPagamento = document.querySelector(
     "input[name=\"formaPagamento\"]:checked"
   );
@@ -265,7 +206,6 @@ function validarFormulario() {
   );
   if (!formaPagamento) {
     if (validacaoFormaPagamento) validacaoFormaPagamento.textContent = "Selecione uma forma de pagamento";
-    // Adiciona estilo de erro visualmente ao grupo se desejado
     formValido = false;
   } else {
     if (validacaoFormaPagamento) validacaoFormaPagamento.textContent = "";
@@ -274,7 +214,6 @@ function validarFormulario() {
   return formValido;
 }
 
-// Função para atualizar o progresso do formulário
 function atualizarProgressoFormulario() {
   const camposObrigatorios = [
     "codigoFornecedor",
@@ -286,7 +225,7 @@ function atualizarProgressoFormulario() {
     "departamento",
   ];
   let preenchidos = 0;
-  const totalObrigatorios = camposObrigatorios.length + 1; // +1 para forma de pagamento
+  const totalObrigatorios = camposObrigatorios.length + 1;
 
   camposObrigatorios.forEach(id => {
       const campo = document.getElementById(id);
@@ -306,10 +245,8 @@ function atualizarProgressoFormulario() {
   )}%`;
 }
 
-// Função para adicionar linha na tabela de adiantamentos
 function adicionarLinhaTabela() {
   const tbody = document.querySelector("#adiantamentosTable tbody");
-  // Limitar a 9 linhas extras (10 no total com a primeira)
   if (tbody.rows.length >= 10) {
       mostrarToast("Máximo de 10 linhas de adiantamento atingido.", "warning");
       return;
@@ -328,51 +265,35 @@ function adicionarLinhaTabela() {
     `;
 
   tbody.appendChild(novaLinha);
-
-  // Adicionar animação à nova linha
   novaLinha.classList.add("fade-in");
-
-  // Mostrar notificação
   mostrarToast("Nova linha adicionada", "success");
 }
 
-// Função para limpar o formulário
 function limparFormulario() {
   document.getElementById("adiantamentoForm").reset();
 
-  // Redefinir data de emissão como data atual
   const hoje = new Date();
   const dataFormatada = hoje.toISOString().split("T")[0];
   document.getElementById("dataEmissao").value = dataFormatada;
-
-  // Recalcular data limite
   atualizarDataLimite();
 
-  // Limpar mensagens de validação
   document.querySelectorAll(".validation-message").forEach((msg) => {
     msg.textContent = "";
   });
 
-  // Remover classes de validação
-  document
-    .querySelectorAll(".input-error, .input-success")
-    .forEach((campo) => {
-      campo.classList.remove("input-error", "input-success");
-    });
+  document.querySelectorAll(".input-error, .input-success").forEach((campo) => {
+    campo.classList.remove("input-error", "input-success");
+  });
 
-  // Resetar progresso
   document.getElementById("formProgress").style.width = "0%";
-
-  // Mostrar notificação
   mostrarToast("Formulário limpo com sucesso", "success");
 }
 
-// Função para mostrar notificação toast
 function mostrarToast(mensagem, tipo = "success") {
   const toastContainer = document.getElementById("toastContainer");
   if (!toastContainer) {
       console.warn("Elemento #toastContainer não encontrado para exibir a notificação.");
-      alert(mensagem); // Fallback para alert
+      alert(mensagem);
       return;
   }
 
@@ -393,22 +314,16 @@ function mostrarToast(mensagem, tipo = "success") {
   `;
 
   toastContainer.appendChild(toast);
-
-  // Força reflow para garantir que a animação funcione
   toast.offsetHeight;
-
   toast.classList.add("show");
 
-  // Iniciar progresso
   const progressElement = toast.querySelector(".toast-progress");
   setTimeout(() => {
       if(progressElement) progressElement.style.width = "100%";
   }, 100);
 
-  // Esconder e remover toast após 3 segundos
   setTimeout(() => {
     toast.classList.remove("show");
-    // Espera a animação de saída terminar antes de remover
     toast.addEventListener("transitionend", () => {
         if (toast.parentNode) {
             toast.parentNode.removeChild(toast);
@@ -417,15 +332,12 @@ function mostrarToast(mensagem, tipo = "success") {
   }, 3000);
 }
 
-
-// Função para validar e gerar PDF
 function validarEGerarPDF() {
   if (validarFormulario()) {
-    gerarPDF(); // Chama a nova função de geração
+    gerarPDF();
     formValidated = true;
   } else {
     mostrarToast("Por favor, corrija os erros no formulário", "error");
-    // Rolar até o primeiro campo com erro
     const primeiroErro = document.querySelector(".input-error");
     if (primeiroErro) {
       primeiroErro.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -433,7 +345,6 @@ function validarEGerarPDF() {
   }
 }
 
-// Função para formatar valores monetários (BRL)
 function formatarMoeda(valor) {
   if (valor === null || valor === undefined || valor === "") return "R$ 0,00";
   const numero = parseFloat(String(valor).replace(/\./g, "").replace(",", "."));
@@ -444,15 +355,13 @@ function formatarMoeda(valor) {
   });
 }
 
-// Função para formatar data (DD/MM/YYYY)
 function formatarData(dataStr) {
   if (!dataStr) return "__/__/____";
   try {
-    // Adiciona hora para evitar problemas de fuso horário
     const data = new Date(dataStr + "T00:00:00");
     if (isNaN(data.getTime())) return "__/__/____";
     const dia = String(data.getDate()).padStart(2, "0");
-    const mes = String(data.getMonth() + 1).padStart(2, "0"); // Meses são 0-indexados
+    const mes = String(data.getMonth() + 1).padStart(2, "0");
     const ano = data.getFullYear();
     return `${dia}/${mes}/${ano}`;
   } catch (e) {
@@ -461,7 +370,25 @@ function formatarData(dataStr) {
   }
 }
 
-// *** NOVA FUNÇÃO gerarPDF ***
+function loadImageAsBase64(url) {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image();
+    img.setAttribute('crossOrigin', 'anonymous');
+    img.onload = function () {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const dataURL = canvas.toDataURL('image/png');
+      resolve(dataURL);
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+// =============== GERADOR PDF COMPLETO ===============
 async function gerarPDF() {
   mostrarToast("Gerando PDF...", "info");
   const { jsPDF } = window.jspdf;
@@ -471,7 +398,7 @@ async function gerarPDF() {
     format: "a4",
   });
 
-  // --- Coleta de Dados ---
+  // --- Coleta dos Dados ---
   const dados = {
     codigoFornecedor: document.getElementById("codigoFornecedor").value,
     finalidade: document.getElementById("finalidade").value,
@@ -480,7 +407,7 @@ async function gerarPDF() {
     dataEmissao: document.getElementById("dataEmissao").value,
     dataPagamento: document.getElementById("dataPagamento").value,
     ordemCompra: document.getElementById("ordemCompra").value,
-    valor: document.getElementById("valor").value, // Já formatado com máscara?
+    valor: document.getElementById("valor").value,
     formaPagamento: document.querySelector("input[name=\"formaPagamento\"]:checked")?.value || "",
     beneficiario: document.getElementById("beneficiario").value,
     cpfCnpj: document.getElementById("cpfCnpj").value,
@@ -495,67 +422,50 @@ async function gerarPDF() {
     adiantamentos: [],
   };
 
-  // Capturar dados da tabela de adiantamentos
   const linhasTabela = document.querySelectorAll("#adiantamentosTable tbody tr");
   linhasTabela.forEach((linha) => {
     const ocInput = linha.querySelector("input[name=\"adiantamentoOC[]\"]");
     const dataInput = linha.querySelector("input[name=\"adiantamentoData[]\"]");
     const valorInput = linha.querySelector("input[name=\"adiantamentoValor[]\"]");
-
     const oc = ocInput ? ocInput.value : "";
     const data = dataInput ? dataInput.value : "";
     const valorRaw = valorInput ? valorInput.value : "";
-
-    // Adiciona apenas se alguma informação estiver presente na linha
     if (oc || data || valorRaw) {
-        // Formata o valor para BRL antes de adicionar
         const valorFormatado = formatarMoeda(valorRaw);
         dados.adiantamentos.push({
             ordemCompra: oc,
-            dataLimite: data, // Será formatado depois
-            valor: valorFormatado // Já formatado
+            dataLimite: data,
+            valor: valorFormatado
         });
     }
   });
 
-  // --- Desenho do PDF ---
+  // === CABEÇALHO AJUSTADO ===
   const margin = 10;
   const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
   const contentWidth = pageWidth - 2 * margin;
   let currentY = margin;
 
-  // Carregar Logo (assumindo que está em /home/ubuntu/upload/logo.png)
-  // Precisamos converter para Base64 ou garantir que o caminho seja acessível
-  // Como não podemos acessar o filesystem diretamente do JS, vamos pular o logo por enquanto
-  // ou pedir ao usuário para fornecer como Base64 se for crítico.
-  // Alternativa: Usar um placeholder
-  doc.setFontSize(10);
-  doc.setTextColor(150);
-  doc.text("[Logo PSR]", margin, currentY + 5);
-  doc.setTextColor(0);
+  // Logo centralizada
+  const logoUrl = "https://i.postimg.cc/v8nRpXB7/logo.png";
+  const logoWidth = 38;
+  const logoHeight = 16;
+  const logoBase64 = await loadImageAsBase64(logoUrl);
+  const logoX = (pageWidth - logoWidth) / 2;
+  doc.addImage(logoBase64, 'PNG', logoX, currentY, logoWidth, logoHeight);
+  currentY += logoHeight + 5;
 
-  // Linha colorida abaixo do logo (simulada)
-  const logoHeight = 15; // Estimativa da altura do logo
-  currentY += logoHeight;
-  const lineColors = ["#FFD700", "#0056B3", "#DC3545"]; // Amarelo, Azul, Vermelho (aproximado)
-  const lineWidthTotal = 60;
-  let currentX = margin + 40; // Posição inicial da linha colorida
-  doc.setLineWidth(2);
-  doc.setDrawColor(lineColors[0]);
-  doc.line(currentX, currentY, currentX + lineWidthTotal * 0.6, currentY);
-  currentX += lineWidthTotal * 0.6;
-  doc.setDrawColor(lineColors[1]);
-  doc.line(currentX, currentY, currentX + lineWidthTotal * 0.3, currentY);
-  currentX += lineWidthTotal * 0.3;
-  doc.setDrawColor(lineColors[2]);
-  doc.line(currentX, currentY, currentX + lineWidthTotal * 0.1, currentY);
+  // Título + Caixa de Versão
+  const tituloY = currentY + 7;
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+  doc.text("FORMULÁRIO DE ADIANTAMENTO À FORNECEDOR", pageWidth / 2, tituloY, { align: "center" });
+  doc.setFont("helvetica", "normal");
 
-  // Caixa FOR_FIN / VERSÃO
   const boxWidth = 40;
   const boxHeight = 10;
   const boxX = pageWidth - margin - boxWidth;
-  const boxY = margin + 5; // Alinhado um pouco abaixo do topo
+  const boxY = tituloY - 7;
   doc.setLineWidth(0.3);
   doc.setDrawColor(0);
   doc.rect(boxX, boxY, boxWidth, boxHeight);
@@ -563,25 +473,18 @@ async function gerarPDF() {
   doc.text("FOR_FIN_02_02", boxX + boxWidth / 2, boxY + 4, { align: "center" });
   doc.text("VERSÃO: 01", boxX + boxWidth / 2, boxY + 8, { align: "center" });
 
-  // Título Principal
-  currentY += 5; // Espaço após linha colorida
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text("FORMULÁRIO DE ADIANTAMENTO À FORNECEDOR", pageWidth / 2, currentY, {
-    align: "center",
-  });
-  doc.setFont("helvetica", "normal");
+  currentY = boxY + boxHeight + 7;
 
-  // Linha abaixo do título
-  currentY += 5;
+  // Linha horizontal
   doc.setLineWidth(0.5);
   doc.line(margin, currentY, pageWidth - margin, currentY);
-  currentY += 8; // Espaço antes dos campos
+  currentY += 8;
 
-  // --- Campos Principais (Layout de 2 colunas) ---
+  // === CAMPOS ESTRUTURADOS (layout 2 colunas) ===
+
   const col1X = margin;
-  const colWidth = contentWidth * 0.55; // Largura da coluna da esquerda
-  const col2X = margin + colWidth + 5; // Início da coluna da direita (Finalidade/Dados Pgto)
+  const colWidth = contentWidth * 0.55;
+  const col2X = margin + colWidth + 5;
   const col2Width = contentWidth - colWidth - 5;
   const fieldHeight = 7;
   const labelOffset = 2;
@@ -592,7 +495,6 @@ async function gerarPDF() {
 
   doc.setFontSize(8);
 
-  // Função auxiliar para desenhar campo com label e valor/linha
   function drawField(x, y, w, label, value) {
     doc.setFont("helvetica", "bold");
     doc.text(label, x, y + labelOffset);
@@ -602,10 +504,9 @@ async function gerarPDF() {
     if (value) {
       doc.text(String(value), x + 2, y + valueOffsetY);
     }
-    return y + fieldHeight + 3; // Retorna a próxima posição Y
+    return y + fieldHeight + 3;
   }
 
-  // Função auxiliar para desenhar caixa com label e valor/linhas
   function drawBoxField(x, y, w, h, label, value, maxLines = 1) {
       doc.setFontSize(8);
       doc.setFont("helvetica", "bold");
@@ -613,14 +514,12 @@ async function gerarPDF() {
       doc.setFont("helvetica", "normal");
       doc.rect(x, y, w, h);
       if (value) {
-          const lines = doc.splitTextToSize(String(value), w - 4); // -4 para padding
+          const lines = doc.splitTextToSize(String(value), w - 4);
           doc.text(lines.slice(0, maxLines), x + 2, y + 4);
       }
-      return y + h + 5; // Retorna a próxima posição Y
+      return y + h + 5;
   }
 
-
-  // Coluna 1
   yCol1 = drawField(col1X, yCol1, colWidth, "CÓDIGO FORNECEDOR:", dados.codigoFornecedor);
   yCol1 = drawField(col1X, yCol1, colWidth, "FORNECEDOR:", dados.fornecedor);
   yCol1 = drawField(col1X, yCol1, colWidth, "CNPJ FORNECEDOR:", dados.cnpjFornecedor);
@@ -651,11 +550,11 @@ async function gerarPDF() {
   doc.text("BOLETO", checkX2 + checkSize + 2, checkY + checkSize - 1);
   if (dados.formaPagamento === "PIX/TED") {
     doc.setFont("zapfdingbats", "bold");
-    doc.text("\u2713", checkX1 + 0.5, checkY + checkSize - 0.5); // Checkmark
+    doc.text("\u2713", checkX1 + 0.5, checkY + checkSize - 0.5);
     doc.setFont("helvetica", "normal");
   } else if (dados.formaPagamento === "BOLETO") {
     doc.setFont("zapfdingbats", "bold");
-    doc.text("\u2713", checkX2 + 0.5, checkY + checkSize - 0.5); // Checkmark
+    doc.text("\u2713", checkX2 + 0.5, checkY + checkSize - 0.5);
     doc.setFont("helvetica", "normal");
   }
   yCol1 += fieldHeight + 3;
@@ -670,16 +569,15 @@ async function gerarPDF() {
 
   // Caixa Dados para Pagamento
   const dadosPgtoY = yCol2;
-  const dadosPgtoHeight = 45; // Altura estimada para caber os campos
+  const dadosPgtoHeight = 45;
   doc.rect(col2X, dadosPgtoY, col2Width, dadosPgtoHeight);
   doc.setFont("helvetica", "bold");
   doc.text("DADOS PARA PAGAMENTO:", col2X + 2, dadosPgtoY + 4);
   doc.setFont("helvetica", "normal");
   let yDados = dadosPgtoY + 8;
-  const fieldWidthDados = col2Width - 4; // Largura interna da caixa
+  const fieldWidthDados = col2Width - 4;
   const labelIndentDados = col2X + 2;
-  const valueIndentDados = col2X + 25; // Indentação para valores
-  const valueWidthDados = col2Width - 27;
+  const valueIndentDados = col2X + 25;
 
   function drawDadosField(y, label, value) {
       doc.setFontSize(7);
@@ -699,7 +597,7 @@ async function gerarPDF() {
   yCol2 = dadosPgtoY + dadosPgtoHeight + 5;
 
   // --- Seção Adiantamentos em Aberto ---
-  currentY = Math.max(yCol1, yCol2) + 5; // Alinha início da seção abaixo da coluna mais longa
+  currentY = Math.max(yCol1, yCol2) + 5;
   doc.setLineWidth(0.5);
   doc.line(margin, currentY, pageWidth - margin, currentY);
   currentY += 5;
@@ -716,7 +614,7 @@ async function gerarPDF() {
   const tableHeaderY = currentY;
   let tableX = margin;
 
-  // Desenhar Cabeçalho
+  // Cabeçalho
   doc.setFontSize(7);
   doc.setFont("helvetica", "bold");
   for (let i = 0; i < tableHeaders.length; i++) {
@@ -726,20 +624,20 @@ async function gerarPDF() {
   }
   currentY += tableRowHeight;
 
-  // Desenhar Linhas da Tabela (mínimo 4 linhas como no template)
+  // Linhas da Tabela (mínimo 4 linhas)
   doc.setFontSize(8);
   doc.setFont("helvetica", "normal");
   const numRowsToDraw = Math.max(4, dados.adiantamentos.length);
   for (let i = 0; i < numRowsToDraw; i++) {
     tableX = margin;
-    const adiantamento = dados.adiantamentos[i]; // Pode ser undefined
+    const adiantamento = dados.adiantamentos[i];
     for (let j = 0; j < tableColWidths.length; j++) {
       doc.rect(tableX, currentY, tableColWidths[j], tableRowHeight);
       let cellValue = "";
       if (adiantamento) {
           if (j === 0) cellValue = adiantamento.ordemCompra;
           else if (j === 1) cellValue = formatarData(adiantamento.dataLimite);
-          else if (j === 2) cellValue = adiantamento.valor; // Já formatado
+          else if (j === 2) cellValue = adiantamento.valor;
       }
       doc.text(String(cellValue), tableX + 2, currentY + 4);
       tableX += tableColWidths[j];
@@ -748,8 +646,8 @@ async function gerarPDF() {
   }
 
   // --- Assinaturas ---
-  currentY += 15; // Espaço antes das assinaturas
-  const signatureY = Math.min(currentY, pageHeight - 30); // Garante que não saia da página
+  currentY += 15;
+  const signatureY = Math.min(currentY, doc.internal.pageSize.getHeight() - 30);
   const signatureLineLength = 60;
   const signatureCol1X = margin + contentWidth * 0.15;
   const signatureCol2X = pageWidth - margin - contentWidth * 0.15 - signatureLineLength;
@@ -757,26 +655,22 @@ async function gerarPDF() {
   doc.setLineWidth(0.3);
   doc.line(signatureCol1X, signatureY, signatureCol1X + signatureLineLength, signatureY);
   doc.text("Solicitante", signatureCol1X + signatureLineLength / 2, signatureY + 4, { align: "center" });
-
   doc.line(signatureCol2X, signatureY, signatureCol2X + signatureLineLength, signatureY);
   doc.text("Controladoria", signatureCol2X + signatureLineLength / 2, signatureY + 4, { align: "center" });
 
   // --- Finalização ---
-  pdfDoc = doc; // Armazena o documento para download
+  pdfDoc = doc;
 
-  // Exibir preview do PDF
   try {
       const pdfData = doc.output("datauristring");
       const pdfContainer = document.getElementById("pdfContainer");
       if (pdfContainer) {
           pdfContainer.innerHTML = `<embed width="100%" height="100%" src="${pdfData}" type="application/pdf">`;
-          // Mostrar o modal de preview
           document.getElementById("pdfPreview").classList.add("active");
           mostrarToast("PDF gerado com sucesso!", "success");
       } else {
           console.error("Elemento #pdfContainer não encontrado.");
           mostrarToast("Erro ao exibir preview do PDF.", "error");
-          // Oferecer download direto como fallback
           downloadPDF();
       }
   } catch (e) {
@@ -785,23 +679,20 @@ async function gerarPDF() {
   }
 }
 
-
-// Função para fechar o preview do PDF
+// Fechar preview
 function fecharPreviewPDF() {
   document.getElementById("pdfPreview").classList.remove("active");
   const pdfContainer = document.getElementById("pdfContainer");
-  if(pdfContainer) pdfContainer.innerHTML = ""; // Limpa o embed para liberar memória
+  if(pdfContainer) pdfContainer.innerHTML = "";
 }
 
-// Função para baixar o PDF
+// Download PDF
 function downloadPDF() {
   if (pdfDoc) {
     const fornecedor = document.getElementById("fornecedor").value || "fornecedor";
     const dataEmissao = document.getElementById("dataEmissao").value || new Date().toISOString().split("T")[0];
-    // Limpa caracteres inválidos para nome de arquivo
     const fornecedorLimpo = fornecedor.replace(/[^a-z0-9]/gi, '_').toLowerCase();
     const nomeArquivo = `Adiantamento_${fornecedorLimpo}_${dataEmissao}.pdf`;
-
     try {
         pdfDoc.save(nomeArquivo);
         mostrarToast("PDF baixado com sucesso!", "success");
@@ -809,13 +700,12 @@ function downloadPDF() {
         console.error("Erro ao salvar PDF:", e);
         mostrarToast("Erro ao baixar o PDF.", "error");
     }
-
   } else {
       mostrarToast("Nenhum PDF gerado para baixar.", "warning");
   }
 }
 
-// Adiciona um container para as notificações Toast no HTML se não existir
+// Toast e modal
 if (!document.getElementById("toastContainer")) {
     const container = document.createElement("div");
     container.id = "toastContainer";
@@ -826,11 +716,10 @@ if (!document.getElementById("toastContainer")) {
     document.body.appendChild(container);
 }
 
-// Adiciona o HTML do Modal de Preview se não existir
 if (!document.getElementById("pdfPreview")) {
     const modal = document.createElement("div");
     modal.id = "pdfPreview";
-    modal.className = "modal-overlay"; // Use classes CSS existentes ou defina estilos
+    modal.className = "modal-overlay";
     modal.innerHTML = `
         <div class="modal-content" style="width: 80%; height: 80%; background: white; padding: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative;">
             <button id="closePdfPreview" style="position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-size: 16px; line-height: 25px; text-align: center;">×</button>
@@ -840,7 +729,6 @@ if (!document.getElementById("pdfPreview")) {
     `;
     document.body.appendChild(modal);
 
-    // Adiciona estilos básicos para o modal se não estiverem no CSS
     const style = document.createElement('style');
     style.textContent = `
         .modal-overlay {
@@ -849,7 +737,6 @@ if (!document.getElementById("pdfPreview")) {
         .modal-overlay.active {
             display: flex;
         }
-        /* Estilos para Toast (simplificado) */
         .toast {
             background-color: #333;
             color: #fff;
@@ -885,7 +772,6 @@ if (!document.getElementById("pdfPreview")) {
     `;
     document.head.appendChild(style);
 
-    // Re-adiciona listeners para botões do modal recém-criado
     document.getElementById("closePdfPreview").addEventListener("click", fecharPreviewPDF);
     document.getElementById("downloadPdfBtn").addEventListener("click", downloadPDF);
 }
