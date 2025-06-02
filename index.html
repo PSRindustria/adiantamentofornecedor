@@ -125,7 +125,23 @@ Exemplo: Aquisição de matéria prima (papel)." class="input-animated"></textar
                     </div>
 
                     <div class="form-row">
-
+                        <div class="form-group half">
+                            <label for="formaPagamento">
+                                <i class="fas fa-credit-card"></i> FORMA DE PAGAMENTO:
+                                <span class="tooltip" data-tooltip="Selecione a forma de pagamento desejada">?</span>
+                            </label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="pixTed" name="formaPagamento" value="PIX/TED">
+                                    <label for="pixTed" class="radio-label">PIX/TED</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="boleto" name="formaPagamento" value="BOLETO">
+                                    <label for="boleto" class="radio-label">BOLETO</label>
+                                </div>
+                            </div>
+                            <div class="validation-message" id="formaPagamento-validation"></div>
+                        </div>
                         <div class="form-group half">
                             <label for="beneficiario">
                                 <i class="fas fa-user"></i> BENEFICIÁRIO:
