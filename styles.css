@@ -849,3 +849,35 @@ td input:focus {
         display: none !important;
     }
 }
+
+
+
+/* Estilos adicionados para responsividade da logo */
+.logo-area {
+    flex: 0 0 150px; /* Base size, adjust as needed */
+    margin-right: var(--spacing-lg); /* Space between logo and title */
+}
+
+.header-logo {
+    display: block; /* Remove extra space below image */
+    max-width: 100%; /* Responsive within its container */
+    height: auto;   /* Maintain aspect ratio */
+}
+
+/* Ajustes para telas menores */
+@media (max-width: 768px) {
+    .logo-area {
+        margin: 0 auto var(--spacing-md) auto; /* Center logo area */
+        flex: none;
+        width: 80%; /* Limit width */
+        max-width: 200px; /* Add max-width */
+    }
+
+    .title {
+        margin-bottom: var(--spacing-xs); /* Space below title */
+    }
+
+    .form-info {
+        margin-top: 0; /* Remove default top margin */
+    }
+}
