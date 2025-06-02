@@ -9,7 +9,7 @@ def get_data(data_dict, key, default=''):
 def format_currency(value_str):
     """Formats a string like '1234,56' to 'R$ 1.234,56'. Handles None or empty."""
     if not value_str:
-        return "R$ 0,00"
+        return 'R$ 0,00'
     try:
         # Remove non-digit characters except comma
         cleaned_value = ''.join(filter(lambda x: x.isdigit() or x == ',', str(value_str)))
@@ -17,9 +17,9 @@ def format_currency(value_str):
         numeric_value = float(cleaned_value.replace(',', '.'))
         # Format as BRL currency
         # Use a temporary placeholder for comma to avoid issues with thousand separator
-        return f"R$ {numeric_value:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+        return f'R$ {numeric_value:,.2f}'.replace(',', 'X').replace('.', ',').replace('X', '.')
     except ValueError:
-        return "R$ 0,00" # Return default if conversion fails
+        return 'R$ 0,00' # Return default if conversion fails
 
 def format_date(date_str):
     """Formats a date string 'YYYY-MM-DD' to 'DD/MM/YYYY'. Handles None or empty."""
@@ -44,23 +44,20 @@ def create_pdf(data, image_path, logo_path, output_path):
     pdf.image(image_path, x=0, y=0, w=img_w_pt, h=img_h_pt)
 
     # Add the new logo to the header
-    # Coordinates and size estimated based on the original template image
-    # Adjust x, y, w, h as needed for precise placement
     logo_x = 30  # Points from left
     logo_y = 20  # Points from top
     logo_w = 200 # Width in points (adjust as needed)
-    # Height will be calculated automatically to maintain aspect ratio if h=0
     pdf.image(logo_path, x=logo_x, y=logo_y, w=logo_w, h=0)
 
     # Set font
     try:
         pdf.set_font('Helvetica', '', 10)
     except RuntimeError:
-        print("Helvetica font not found, trying Arial")
+        print('Helvetica font not found, trying Arial')
         try:
             pdf.set_font('Arial', '', 10)
         except RuntimeError:
-             print("Arial font not found. Using default font.")
+             print('Arial font not found. Using default font.')
              pass # Continue with default
 
     pdf.set_text_color(0, 0, 0)
@@ -115,18 +112,18 @@ def create_pdf(data, image_path, logo_path, output_path):
 
     # Handle Forma de Pagamento Checkboxes
     forma_pagamento = get_data(data, 'formaPagamento')
-    checkbox_mark = 'X' # Or use a checkmark symbol if font supports
-    pdf.set_font_size(12) # Make checkmark slightly larger
+    checkbox_mark = 'X'
+    pdf.set_font_size(12)
     if forma_pagamento == 'PIX/TED':
         pdf.set_xy(158, 445)
         pdf.cell(15, 15, txt=checkbox_mark, border=0, ln=0, align='C')
     elif forma_pagamento == 'BOLETO':
         pdf.set_xy(258, 445)
         pdf.cell(15, 15, txt=checkbox_mark, border=0, ln=0, align='C')
-    pdf.set_font_size(10) # Reset font size
+    pdf.set_font_size(10)
 
     # Handle Adiantamentos em Aberto Table
-    table_data = data.get('adiantamentos', []) # Expecting a list of dicts
+    table_data = data.get('adiantamentos', [])
     start_y = 675
     row_height = 25
     col_x = {
@@ -134,7 +131,7 @@ def create_pdf(data, image_path, logo_path, output_path):
         'data': 355,
         'valor': 655
     }
-    max_rows = 4 # Max rows visible in the template
+    max_rows = 10 # Updated max rows
 
     for i, row in enumerate(table_data):
         if i >= max_rows:
@@ -155,11 +152,11 @@ def create_pdf(data, image_path, logo_path, output_path):
 
     # Output PDF
     pdf.output(output_path)
-    print(f"PDF generated successfully: {output_path}")
+    print(f'PDF generated successfully: {output_path}')
 
 # --- Example Usage ---
 if __name__ == '__main__':
-    # Sample data mimicking form submission
+    # Sample data mimicking form submission (Corrected)
     sample_data = {
         'codigoFornecedor': '12345',
         'fornecedor': 'EMPRESA EXEMPLO LTDA',
@@ -167,11 +164,11 @@ if __name__ == '__main__':
         'dataEmissao': '2025-06-02',
         'dataPagamento': '2025-06-10',
         'ordemCompra': 'OC-9876',
-        'valor': '1500,50', # Comma as decimal separator
-        'formaPagamento': 'PIX/TED', # or 'BOLETO'
+        'valor': '1500,50',
+        'formaPagamento': 'PIX/TED',
         'solicitante': 'Fulano de Tal',
         'departamento': 'Financeiro',
-        'dataLimitePrestacao': '2025-07-02', # Calculated, but can be passed
+        'dataLimitePrestacao': '2025-07-02',
         'finalidade': 'Adiantamento para compra de material de escritório urgente conforme pedido XYZ. Necessário pagamento rápido.',
         'beneficiario': 'EMPRESA EXEMPLO LTDA',
         'cpfCnpj': '11.222.333/0001-44',
@@ -183,13 +180,19 @@ if __name__ == '__main__':
         'adiantamentos': [
             {'oc': 'OC-111', 'data': '2025-05-15', 'valor': '500,00'},
             {'oc': 'OC-222', 'data': '2025-05-20', 'valor': '250,75'},
-            # Add more rows if needed, up to 4 will be shown
+            {'oc': 'OC-333', 'data': '2025-05-21', 'valor': '100,00'},
+            {'oc': 'OC-444', 'data': '2025-05-22', 'valor': '50,50'},
+            {'oc': 'OC-555', 'data': '2025-05-23', 'valor': '123,45'},
+            {'oc': 'OC-666', 'data': '2025-05-24', 'valor': '678,90'},
+            {'oc': 'OC-777', 'data': '2025-05-25', 'valor': '11,22'},
+            {'oc': 'OC-888', 'data': '2025-05-26', 'valor': '33,44'},
+            {'oc': 'OC-999', 'data': '2025-05-27', 'valor': '55,66'},
+            {'oc': 'OC-000', 'data': '2025-05-28', 'valor': '77,88'}
         ]
     }
 
-    image_file = '/home/ubuntu/upload/image.png' # The form background template
-    logo_file = '/home/ubuntu/assets/logo_cabecalho.png' # The new logo
-    output_file = '/home/ubuntu/formulario_adiantamento_com_logo.pdf'
+    image_file = '/home/ubuntu/assets/image_no_small_logo.png' # Use edited background
+    logo_file = '/home/ubuntu/assets/logo_cabecalho.png'
+    output_file = '/home/ubuntu/formulario_adiantamento_10_linhas.pdf' # New output name
 
     create_pdf(sample_data, image_file, logo_file, output_file)
-
