@@ -448,7 +448,7 @@ async function gerarPDF() {
 
   // Logo centralizada
   const logoUrl = "https://i.postimg.cc/v8nRpXB7/logo.png";
-  const logoWidth = 150;  // ajuste se preferir menor
+  const logoWidth = 200;  // ajuste se preferir menor
   const logoHeight = 16;
   const logoX = pageWidth - margin - logoWidth;
   const logoY = currentY;
