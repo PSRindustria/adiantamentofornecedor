@@ -58,7 +58,18 @@ function atualizarDataLimite() {
 
 function atualizarCamposPagamento() {}
 
+function aplicarMascaraValor(input) {
+  input.addEventListener("input", function (e) {
+    let valor = e.target.value.replace(/\D/g, "");
+    valor = (parseInt(valor, 10) / 100).toFixed(2) + "";
+    valor = valor.replace(".", ",");
+    valor = valor.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+    e.target.value = valor === "NaN" || valor === "0,00" ? "" : valor;
+  });
+}
+
 function inicializarMascaras() {
+  // CNPJ e CPF/CNPJ - MANTÉM SUA LÓGICA ORIGINAL
   const cnpjInput = document.getElementById("cnpjFornecedor");
   if (cnpjInput) {
     cnpjInput.addEventListener("input", function (e) {
@@ -112,16 +123,14 @@ function inicializarMascaras() {
     });
   }
 
+  // Campo principal de valor
   const valorInput = document.getElementById("valor");
   if (valorInput) {
-    valorInput.addEventListener("input", function (e) {
-      let valor = e.target.value.replace(/\D/g, "");
-      valor = (parseInt(valor, 10) / 100).toFixed(2) + "";
-      valor = valor.replace(".", ",");
-      valor = valor.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
-      e.target.value = valor === "NaN" || valor === "0,00" ? "" : valor;
-    });
+    aplicarMascaraValor(valorInput);
   }
+
+  // Máscara nos campos de adiantamentos já existentes
+  document.querySelectorAll('.valor-adiantamento').forEach(aplicarMascaraValor);
 }
 
 function validarCampo(campo) {
@@ -267,6 +276,9 @@ function adicionarLinhaTabela() {
   tbody.appendChild(novaLinha);
   novaLinha.classList.add("fade-in");
   mostrarToast("Nova linha adicionada", "success");
+
+  // Inicializa máscara no novo campo
+  novaLinha.querySelectorAll('.valor-adiantamento').forEach(aplicarMascaraValor);
 }
 
 function limparFormulario() {
