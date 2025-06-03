@@ -472,7 +472,7 @@ async function gerarPDF() {
   const tituloY = currentY + 7;
   doc.setFontSize(12);
   doc.setFont("helvetica", "bold");
-  doc.text("FORMULÁRIO DE ADIANTAMENTO À FORNECEDOR", pageWidth / 2, tituloY, { align: "center" });
+  doc.text("FORMULÁRIO DE ADIANTAMENTO À FORNECEDOR", pageWidth / 2, tituloY, { align: "left" });
   doc.setFont("helvetica", "normal");
 
   const boxWidth = 40;
