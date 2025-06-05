@@ -579,7 +579,7 @@ function drawBoxField(x, y, w, h, label, value) {
 
   // Coluna 2
   const finalidadeHeight = 30;
-  yCol2 = drawBoxField(col2X, yCol2, col2Width, finalidadeHeight, "FINALIDADE:", dados.finalidade, 5);
+  yCol2 = drawBoxField(col2X, yCol2, col2Width, finalidadeHeight, "FINALIDADE:", dados.finalidade);
 
   // Caixa Dados para Pagamento
   const dadosPgtoY = yCol2;
