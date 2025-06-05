@@ -580,7 +580,7 @@ async function gerarPDF() {
 const finalidadeMaxChars = 1000;
 const finalidadeTexto = dados.finalidade ? dados.finalidade.substring(0, finalidadeMaxChars) : "";
 const finalidadeLines = doc.splitTextToSize(finalidadeTexto, col2Width - 4);
-const finalidadeLineHeight = 5; // altura de linha ajustada para múltiplas linhas
+const finalidadeLineHeight = 3.2; // altura de linha ajustada para múltiplas linhas
 const finalidadeBoxHeight = Math.max(12, finalidadeLines.length * finalidadeLineHeight + 5);
 doc.setFontSize(8);
 doc.setFont("helvetica", "bold");
@@ -679,9 +679,9 @@ yCol2 += finalidadeBoxHeight + 5;
 
   doc.setLineWidth(0.3);
   doc.line(signatureCol1X, signatureY, signatureCol1X + signatureLineLength, signatureY);
-  doc.text("Solicitante", signatureCol1X + signatureLineLength / 2, signatureY + 4, { align: "center" });
+  doc.text("Solicitante", signatureCol1X + signatureLineLength / 2, signatureY + 5, { align: "center" });
   doc.line(signatureCol2X, signatureY, signatureCol2X + signatureLineLength, signatureY);
-  doc.text("Controladoria", signatureCol2X + signatureLineLength / 2, signatureY + 4, { align: "center" });
+  doc.text("Controladoria", signatureCol2X + signatureLineLength / 2, signatureY + 5, { align: "center" });
 
   // --- Finalização ---
   pdfDoc = doc;
