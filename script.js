@@ -520,18 +520,19 @@ async function gerarPDF() {
     return y + fieldHeight + 3;
   }
 
-  function drawBoxField(x, y, w, h, label, value, maxLines = 1) {
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "bold");
-      doc.text(label, x, y - 2);
-      doc.setFont("helvetica", "normal");
-      doc.rect(x, y, w, h);
-      if (value) {
-          const lines = doc.splitTextToSize(String(value), w - 4);
-          doc.text(lines, x + 2, y + 4);
-      }
-      return y + h + 5;
-  }
+function drawBoxField(x, y, w, h, label, value) {
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "bold");
+    doc.text(label, x, y - 2);
+    doc.setFont("helvetica", "normal");
+    doc.rect(x, y, w, h);
+    if (value) {
+        const lines = doc.splitTextToSize(String(value), w - 4);
+        const maxLines = Math.floor(h / 4.5);
+        doc.text(lines.slice(0, maxLines), x + 2, y + 4);
+    }
+    return y + h + 5;
+}
 
   yCol1 = drawField(col1X, yCol1, colWidth, "CÓDIGO FORNECEDOR:", dados.codigoFornecedor);
   yCol1 = drawField(col1X, yCol1, colWidth, "FORNECEDOR:", dados.fornecedor);
