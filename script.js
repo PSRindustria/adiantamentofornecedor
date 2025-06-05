@@ -672,7 +672,7 @@ yCol2 += finalidadeBoxHeight + 5;
 
   // --- Assinaturas ---
   currentY += 15;
-  const signatureY = Math.min(currentY, doc.internal.pageSize.getHeight() - 30);
+  const signatureY = Math.min(currentY, doc.internal.pageSize.getHeight() - 35);
   const signatureLineLength = 60;
   const signatureCol1X = margin + contentWidth * 0.15;
   const signatureCol2X = pageWidth - margin - contentWidth * 0.15 - signatureLineLength;
