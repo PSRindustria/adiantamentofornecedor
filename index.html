@@ -331,5 +331,22 @@ Exemplo: Aquisição de matéria prima (papel)." class="input-animated" maxlengt
 
 
     <script src="script.js"></script>
+    <script>
+document.getElementById("finalidade").addEventListener("input", function() {
+    const maxChars = 1000;
+    const maxLines = 20;
+
+    // Limita caracteres
+    if (this.value.length > maxChars) {
+        this.value = this.value.slice(0, maxChars);
+    }
+
+    // Limita linhas
+    let lines = this.value.split('\n');
+    if (lines.length > maxLines) {
+        this.value = lines.slice(0, maxLines).join('\n');
+    }
+});
+</script>
 </body>
 </html>
