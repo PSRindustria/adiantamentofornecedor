@@ -681,7 +681,7 @@ yCol2 += finalidadeBoxHeight + 5;
   doc.line(signatureCol1X, signatureY, signatureCol1X + signatureLineLength, signatureY);
   doc.text("Solicitante", signatureCol1X + signatureLineLength / 2, signatureY + 6, { align: "center" });
   doc.line(signatureCol2X, signatureY, signatureCol2X + signatureLineLength, signatureY);
-  doc.text("Controladoria", signatureCol2X + signatureLineLength / 3, signatureY + 6, { align: "center" });
+  doc.text("Controladoria", signatureCol2X + signatureLineLength / 2, signatureY + 6, { align: "center" });
 
   // --- Finalização ---
   pdfDoc = doc;
