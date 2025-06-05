@@ -581,7 +581,7 @@ const finalidadeMaxChars = 1000;
 const finalidadeTexto = dados.finalidade ? dados.finalidade.substring(0, finalidadeMaxChars) : "";
 const finalidadeLines = doc.splitTextToSize(finalidadeTexto, col2Width - 4);
 const finalidadeLineHeight = 5; // altura de linha ajustada para múltiplas linhas
-const finalidadeBoxHeight = Math.max(15, finalidadeLines.length * finalidadeLineHeight + 5);
+const finalidadeBoxHeight = Math.max(12, finalidadeLines.length * finalidadeLineHeight + 5);
 doc.setFontSize(8);
 doc.setFont("helvetica", "bold");
 doc.text("FINALIDADE:", col2X, yCol2 - 2);
