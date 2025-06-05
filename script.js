@@ -520,19 +520,18 @@ async function gerarPDF() {
     return y + fieldHeight + 3;
   }
 
-function drawBoxField(x, y, w, h, label, value) {
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "bold");
-    doc.text(label, x, y - 2);
-    doc.setFont("helvetica", "normal");
-    doc.rect(x, y, w, h);
-    if (value) {
-        const lines = doc.splitTextToSize(String(value), w - 4);
-        const maxLines = Math.floor(h / 4.5);
-        doc.text(lines.slice(0, maxLines), x + 2, y + 4);
-    }
-    return y + h + 5;
-}
+  function drawBoxField(x, y, w, h, label, value, maxLines = 1) {
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "bold");
+      doc.text(label, x, y - 2);
+      doc.setFont("helvetica", "normal");
+      doc.rect(x, y, w, h);
+      if (value) {
+          const lines = doc.splitTextToSize(String(value), w - 4);
+          doc.text(lines.slice(0, maxLines), x + 2, y + 4);
+      }
+      return y + h + 5;
+  }
 
   yCol1 = drawField(col1X, yCol1, colWidth, "CÓDIGO FORNECEDOR:", dados.codigoFornecedor);
   yCol1 = drawField(col1X, yCol1, colWidth, "FORNECEDOR:", dados.fornecedor);
@@ -578,8 +577,20 @@ function drawBoxField(x, y, w, h, label, value) {
   yCol1 = drawField(col1X, yCol1, colWidth, "DATA LIMITE PARA PRESTAÇÃO DE CONTAS:", formatarData(dados.dataLimitePrestacao));
 
   // Coluna 2
-  const finalidadeHeight = 30;
-  yCol2 = drawBoxField(col2X, yCol2, col2Width, finalidadeHeight, "FINALIDADE:", dados.finalidade);
+const finalidadeMaxChars = 1000;
+const finalidadeTexto = dados.finalidade ? dados.finalidade.substring(0, finalidadeMaxChars) : "";
+const finalidadeLines = doc.splitTextToSize(finalidadeTexto, col2Width - 4);
+const finalidadeLineHeight = 5; // altura de linha ajustada para múltiplas linhas
+const finalidadeBoxHeight = Math.max(15, finalidadeLines.length * finalidadeLineHeight + 5);
+doc.setFontSize(8);
+doc.setFont("helvetica", "bold");
+doc.text("FINALIDADE:", col2X, yCol2 - 2);
+doc.setFont("helvetica", "normal");
+doc.rect(col2X, yCol2, col2Width, finalidadeBoxHeight);
+if (finalidadeLines.length) {
+    doc.text(finalidadeLines, col2X + 2, yCol2 + 4);
+}
+yCol2 += finalidadeBoxHeight + 5;
 
   // Caixa Dados para Pagamento
   const dadosPgtoY = yCol2;
