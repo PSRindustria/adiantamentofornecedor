@@ -528,7 +528,7 @@ async function gerarPDF() {
       doc.rect(x, y, w, h);
       if (value) {
           const lines = doc.splitTextToSize(String(value), w - 4);
-          doc.text(lines.slice(0, maxLines), x + 2, y + 4);
+          doc.text(lines, x + 2, y + 4);
       }
       return y + h + 5;
   }
