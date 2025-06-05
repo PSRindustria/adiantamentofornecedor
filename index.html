@@ -336,15 +336,16 @@ document.getElementById("finalidade").addEventListener("input", function() {
     const maxChars = 1000;
     const maxLines = 20;
 
-    // Limita caracteres
-    if (this.value.length > maxChars) {
-        this.value = this.value.slice(0, maxChars);
-    }
-
-    // Limita linhas
+    // Primeiro: limita as linhas
     let lines = this.value.split('\n');
     if (lines.length > maxLines) {
         this.value = lines.slice(0, maxLines).join('\n');
+        lines = this.value.split('\n'); // atualiza o array de linhas
+    }
+
+    // Depois: limita os caracteres (prioridade é manter as linhas, não ultrapassar o limite de chars)
+    if (this.value.length > maxChars) {
+        this.value = this.value.slice(0, maxChars);
     }
 });
 </script>
