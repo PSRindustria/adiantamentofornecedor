@@ -61,16 +61,27 @@ Exemplo: Aquisição de matéria prima (papel)." class="input-animated" maxlengt
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group half">
-                            <label for="cnpjFornecedor">
-                                <i class="fas fa-id-card"></i> CNPJ FORNECEDOR:
-                                <span class="tooltip" data-tooltip="CNPJ no formato XX.XXX.XXX/XXXX-XX">?</span>
-                            </label>
-                            <input type="text" id="cnpjFornecedor" name="cnpjFornecedor" placeholder="XX.XXX.XXX/XXXX-XX" class="input-animated" data-mask="cnpj">
-                            <div class="validation-message" id="cnpjFornecedor-validation"></div>
-                        </div>
-                    </div>
+<div class="form-row">
+  <div class="form-group half">
+    <label>
+      <i class="fas fa-id-card"></i> DOCUMENTO FORNECEDOR:
+    </label>
+
+    <div class="radio-group" id="tipoDocumentoFornecedorGroup" style="margin-bottom:6px">
+      <label><input type="radio" name="tipoDocumentoFornecedor" value="cnpj" checked> CNPJ</label>
+      <label><input type="radio" name="tipoDocumentoFornecedor" value="cpf"> CPF</label>
+    </div>
+
+    <input
+      type="text"
+      id="documentoFornecedor"
+      placeholder="XX.XXX.XXX/XXXX-XX"
+      class="input-animated"
+      autocomplete="off"
+    >
+    <div class="validation-message" id="documentoFornecedor-validation"></div>
+  </div>
+</div>
 
                     <div class="form-row">
                         <div class="form-group half">
