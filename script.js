@@ -157,10 +157,14 @@ function validarCampo(campo) {
     valido = false;
   }
 
-  if (valido && id === "cnpjFornecedor" && !validarCNPJ(valor)) {
-    if (mensagemValidacao) mensagemValidacao.textContent = "CNPJ inválido";
+if (valido && id === "documentoFornecedor") {
+  const tipo = document.querySelector('input[name="tipoDocumentoFornecedor"]:checked')?.value || "cnpj";
+  const ok = (tipo === "cpf") ? validarCPF(valor) : validarCNPJ(valor);
+  if (!ok) {
+    if (mensagemValidacao) mensagemValidacao.textContent = (tipo === "cpf") ? "CPF inválido" : "CNPJ inválido";
     valido = false;
   }
+}
 
   if (valido && id === "valor") {
     const valorNumerico = parseFloat(valor.replace(/\./g, "").replace(",", "."));
@@ -414,8 +418,9 @@ async function gerarPDF() {
   const dados = {
     codigoFornecedor: document.getElementById("codigoFornecedor").value,
     finalidade: document.getElementById("finalidade").value,
-    fornecedor: document.getElementById("fornecedor").value,
-    cnpjFornecedor: document.getElementById("cnpjFornecedor").value,
+fornecedor: document.getElementById("fornecedor").value,
+tipoDocumentoFornecedor: document.querySelector('input[name="tipoDocumentoFornecedor"]:checked')?.value || "cnpj",
+documentoFornecedor: document.getElementById("documentoFornecedor").value,
     dataEmissao: document.getElementById("dataEmissao").value,
     dataPagamento: document.getElementById("dataPagamento").value,
     ordemCompra: document.getElementById("ordemCompra").value,
@@ -535,7 +540,8 @@ async function gerarPDF() {
 
   yCol1 = drawField(col1X, yCol1, colWidth, "CÓDIGO FORNECEDOR:", dados.codigoFornecedor);
   yCol1 = drawField(col1X, yCol1, colWidth, "FORNECEDOR:", dados.fornecedor);
-  yCol1 = drawField(col1X, yCol1, colWidth, "CNPJ FORNECEDOR:", dados.cnpjFornecedor);
+const labelDoc = (dados.tipoDocumentoFornecedor === "cpf") ? "CPF FORNECEDOR:" : "CNPJ FORNECEDOR:";
+yCol1 = drawField(col1X, yCol1, colWidth, labelDoc, dados.documentoFornecedor);
   yCol1 = drawField(col1X, yCol1, colWidth, "DATA DE EMISSÃO:", formatarData(dados.dataEmissao));
   yCol1 = drawField(col1X, yCol1, colWidth, "DATA PARA PAGAMENTO:", formatarData(dados.dataPagamento));
   yCol1 = drawField(col1X, yCol1, colWidth, "ORDEM DE COMPRA:", dados.ordemCompra);
@@ -800,3 +806,60 @@ if (!document.getElementById("pdfPreview")) {
     document.getElementById("closePdfPreview").addEventListener("click", fecharPreviewPDF);
     document.getElementById("downloadPdfBtn").addEventListener("click", downloadPDF);
 }
+// ------------------- VALIDAÇÃO CPF / CNPJ -------------------
+
+function validarCNPJ(cnpj) {
+  const s = (cnpj || "").replace(/\D/g, "");
+  if (s.length !== 14 || /^(\d)\1+$/.test(s)) return false;
+  let soma = 0, peso = [5,4,3,2,9,8,7,6,5,4,3,2];
+  for (let i = 0; i < 12; i++) soma += parseInt(s[i]) * peso[i];
+  let d1 = 11 - (soma % 11); if (d1 >= 10) d1 = 0;
+  if (d1 !== parseInt(s[12])) return false;
+  soma = 0; peso = [6].concat(peso);
+  for (let i = 0; i < 13; i++) soma += parseInt(s[i]) * peso[i];
+  let d2 = 11 - (soma % 11); if (d2 >= 10) d2 = 0;
+  return d2 === parseInt(s[13]);
+}
+
+function validarCPF(cpf) {
+  const s = (cpf || "").replace(/\D/g, "");
+  if (s.length !== 11 || /^(\d)\1+$/.test(s)) return false;
+  let soma = 0; for (let i = 0; i < 9; i++) soma += parseInt(s[i]) * (10 - i);
+  let d1 = 11 - (soma % 11); if (d1 >= 10) d1 = 0;
+  if (d1 !== parseInt(s[9])) return false;
+  soma = 0; for (let i = 0; i < 10; i++) soma += parseInt(s[i]) * (11 - i);
+  let d2 = 11 - (soma % 11); if (d2 >= 10) d2 = 0;
+  return d2 === parseInt(s[10]);
+}
+
+// ------------------- MÁSCARA AUTOMÁTICA -------------------
+
+function aplicarMascaraDocumentoFornecedor() {
+  const tipo = document.querySelector('input[name="tipoDocumentoFornecedor"]:checked')?.value || "cnpj";
+  const input = document.getElementById("documentoFornecedor");
+  input.placeholder = (tipo === "cpf") ? "XXX.XXX.XXX-XX" : "XX.XXX.XXX/XXXX-XX";
+
+  input.addEventListener("input", function (e) {
+    let v = e.target.value.replace(/\D/g, "");
+    if (tipo === "cpf") {
+      v = v.slice(0,11)
+        .replace(/^(\d{3})(\d)/, "$1.$2")
+        .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+        .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+    } else {
+      v = v.slice(0,14)
+        .replace(/^(\d{2})(\d)/, "$1.$2")
+        .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+        .replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3/$4")
+        .replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, "$1.$2.$3/$4-$5");
+    }
+    e.target.value = v;
+  }, { once: true });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementsByName("tipoDocumentoFornecedor").forEach(r => {
+    r.addEventListener("change", aplicarMascaraDocumentoFornecedor);
+  });
+  aplicarMascaraDocumentoFornecedor();
+});
